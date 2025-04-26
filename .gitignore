@@ -5,5 +5,7 @@ Cargo.lock
 .mypy_cache
 .pytest_cache
 tmp
-
-
+python/keplemon/*.dylib
+python/keplemon/*.so
+python/keplemon/*.dll
+python/keplemon/*.lib
