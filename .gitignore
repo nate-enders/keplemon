@@ -1,0 +1,10 @@
+/target
+venv/
+Cargo.lock
+/SGP4_Open_License.txt
+.mypy_cache
+.pytest_cache
+tmp
+python/keplemon/*.dylib
+python/keplemon/assets/*
+python/keplemon/
