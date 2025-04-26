@@ -7,4 +7,3 @@ Cargo.lock
 tmp
 python/keplemon/*.dylib
 python/keplemon/assets/*
-python/keplemon/
