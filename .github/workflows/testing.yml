@@ -109,6 +109,8 @@ jobs:
         run: |
           cargo install --locked cargo-make
           pip install ".[dev]"
-
-      - name: Test build
-        run: cargo make test-mac-amd
+          cp lib/mac/amd/* python/keplemon/
+          git add -f python/keplemon/*.dylib
+          maturin build --release
+          pip install --force-reinstall target/wheels/*.whl
+          pytest -v --tb=shore tests
