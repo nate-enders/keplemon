@@ -5,7 +5,8 @@ script = [
     "rm -rf python/keplemon/*.so",
     "rm -rf python/keplemon/*.dylib",
     "rm -rf python/keplemon/*.dll",
-    "rm -rf python/keplemon/assets/*",
+    "rm -rf python/keplemon/assets/",
+    "mkdir python/keplemon/assets/",
     "cp assets/* python/keplemon/assets/",
 ]
 
