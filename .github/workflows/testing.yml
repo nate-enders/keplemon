@@ -113,4 +113,4 @@ jobs:
           git add -f python/keplemon/*.dylib
           maturin build --release
           pip install --force-reinstall target/wheels/*.whl
-          pytest -v --tb=shore tests
+          pytest -v --tb=short tests
