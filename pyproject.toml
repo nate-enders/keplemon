@@ -10,6 +10,7 @@ test = ["pytest"]
 [tool.maturin]
 python-source = "python"
 module-name = "keplemon._keplemon"
+include = ["python/keplemon/*"]
 
 [build-system]
 requires = ["maturin>=1.0,<2.0"]
