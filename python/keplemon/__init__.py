@@ -1,5 +1,5 @@
 from keplemon._keplemon.time import load_time_constants  # type: ignore
-from keplemon._keplemon import get_thread_count  # type: ignore
+from keplemon._keplemon import get_thread_count, set_thread_count  # type: ignore
 from pathlib import Path
 from shutil import copyfile
 
@@ -14,4 +14,4 @@ if not working_license_path.exists():
 time_constants_path = current_dir / "assets" / "time_constants.dat"
 load_time_constants(time_constants_path.as_posix())
 
-__all__ = ["get_thread_count"]
+__all__ = ["get_thread_count", "set_thread_count"]

@@ -6,7 +6,9 @@ script = [
     "rm -rf python/keplemon/*.dylib",
     "rm -rf python/keplemon/*.dll",
     "rm -rf python/keplemon/assets/*",
+    "rm -rf python/keplemon/*.pyi",
     "cp assets/* python/keplemon/assets/",
+    "cp stubs/keplemon/*.pyi python/keplemon/",
 ]
 
 [tasks.copy-mac-arm]

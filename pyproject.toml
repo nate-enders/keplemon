@@ -4,7 +4,7 @@ version = "0.1.0"
 dependencies = ["requests"]
 
 [project.optional-dependencies]
-dev = ["maturin", "keplemon[test]"]
+dev = ["maturin", "keplemon[test]", "mkdocstrings[python]", "mkdocs-material"]
 test = ["pytest"]
 
 [tool.maturin]

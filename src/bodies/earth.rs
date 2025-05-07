@@ -1,7 +1,7 @@
 use crate::saal::env_const_interface;
 use pyo3::prelude::*;
 
-#[pyclass]
+#[pyclass(subclass)]
 #[derive(Debug, PartialEq)]
 pub struct Earth {}
 
