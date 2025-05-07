@@ -34,6 +34,12 @@ jobs:
       - name: Test build
         run: cargo make test-windows
 
+      - name: Upload wheel
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-whl
+          path: target/wheels/*.whl
+
   test-linux-amd:
     runs-on: ubuntu-24.04
     strategy:
@@ -60,6 +66,13 @@ jobs:
 
       - name: Test build
         run: cargo make test-linux-amd
+
+      - name: Upload wheel
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-amd-whl
+          path: target/wheels/*.whl
+
   test-macos-arm:
     runs-on: macos-14
     strategy:
@@ -86,6 +99,13 @@ jobs:
 
       - name: Test build
         run: cargo make test-mac-arm
+
+      - name: Upload wheel
+        uses: actions/upload-artifact@v4
+        with:
+          name: mac-arm-whl
+          path: target/wheels/*.whl
+
   test-macos-amd:
     runs-on: macos-13
     strategy:
@@ -109,5 +129,12 @@ jobs:
         run: |
           cargo install --locked cargo-make
           pip install ".[dev]"
+
       - name: Test build
         run: cargo make test-mac-amd
+
+      - name: Upload wheel
+        uses: actions/upload-artifact@v4
+        with:
+          name: mac-amd-whl
+          path: target/wheels/*.whl

@@ -4,3 +4,4 @@
 
 - [Getting Started](getting_started.md)
 - [Package Contents](submodules/index.md)
+- [License](license.md)

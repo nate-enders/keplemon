@@ -132,3 +132,33 @@ description = "Run the tests for Windows"
 command = "pytest"
 args = ["-v", "--tb=short", "tests"]
 dependencies = ["install-windows"]
+
+[tasks.publish-mac-arm]
+description = "Publish the wheel for macOS ARM"
+command = "twine"
+args = ["upload", "target/wheels/*"]
+dependencies = ["test-mac-arm"]
+
+[tasks.publish-mac-amd]
+description = "Publish the wheel for macOS AMD"
+command = "twine"
+args = ["upload", "target/wheels/*"]
+dependencies = ["test-mac-amd"]
+
+[tasks.publish-linux-arm]
+description = "Publish the wheel for Linux ARM"
+command = "twine"
+args = ["upload", "target/wheels/*"]
+dependencies = ["test-linux-arm"]
+
+[tasks.publish-linux-amd]
+description = "Publish the wheel for Linux AMD"
+command = "twine"
+args = ["upload", "target/wheels/*"]
+dependencies = ["test-linux-amd"]
+
+[tasks.publish-windows]
+description = "Publish the wheel for Windows"
+command = "twine"
+args = ["upload", "target/wheels/*"]
+dependencies = ["test-windows"]
