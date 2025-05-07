@@ -29,7 +29,8 @@ jobs:
           pip install ".[dev]"
 
       - name: Build site
-        run: mkdocs build
+        run: |
+          PYTHONPATH=stubs mkdocs build --clean
 
       - name: Add CNAME for custom domain
         run: echo 'keplemon.citra.space' > site/CNAME

@@ -2,10 +2,8 @@ use super::{TimeComponents, TimeSpan};
 use crate::enums::TimeSystem;
 use crate::saal::time_func_interface;
 use pyo3::prelude::*;
-use std::{
-    hash::Hash,
-    ops::{Add, AddAssign, Sub},
-};
+use std::hash::Hash;
+use std::ops::{Add, AddAssign, Sub};
 
 #[pyclass]
 #[derive(Debug, Copy, Clone, PartialEq)]
