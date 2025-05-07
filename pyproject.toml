@@ -1,0 +1,26 @@
+[project]
+name = "keplemon"
+version = "0.1.1"
+dependencies = ["requests", "click"]
+
+[project.optional-dependencies]
+dev = [
+    "maturin",
+    "keplemon[test]",
+    "mkdocstrings[python]",
+    "mkdocs-material",
+    "markdown-include",
+]
+test = ["pytest"]
+
+[project.scripts]
+keplemon = "keplemon.__main__:cli"
+
+[tool.maturin]
+python-source = "python"
+module-name = "keplemon._keplemon"
+include = ["keplemon/*"]
+
+[build-system]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
