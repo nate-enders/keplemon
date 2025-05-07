@@ -1,7 +1,9 @@
 # flake8: noqa
+from __future__ import annotations
+from pathlib import Path
 from keplemon.enums import TimeSystem
 
-def request_time_constants_update(output_path: str) -> None: ...
+def request_time_constants_update(output_path: str | Path) -> None: ...
 
 class TimeSpan:
     @classmethod

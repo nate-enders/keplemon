@@ -1,3 +1,0 @@
-# keplemon.enums
-
-::: keplemon.enums

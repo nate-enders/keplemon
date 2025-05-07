@@ -5,7 +5,7 @@
         show_root_heading: true
         show_root_full_path: false
 
-## Sub-Modules
+## Submodules
 
 - [enums](enums.md)
 - [time](time.md)

@@ -11,7 +11,7 @@ if not working_license_path.exists():
     copyfile(current_dir / "SGP4_Open_License.txt", working_license_path)
 
 # Load the time constants from the assets directory
-time_constants_path = current_dir / "assets" / "time_constants.dat"
-load_time_constants(time_constants_path.as_posix())
+TIME_CONSTANTS_PATH = current_dir / "assets" / "time_constants.dat"
+load_time_constants(TIME_CONSTANTS_PATH.as_posix())
 
-__all__ = ["get_thread_count", "set_thread_count"]
+__all__ = ["get_thread_count", "set_thread_count", "TIME_CONSTANTS_PATH"]

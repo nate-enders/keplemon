@@ -5,9 +5,10 @@ use_directory_urls: false
 nav:
   - Home: index.md
   - Getting Started: getting_started.md
-  - Modules:
-      - time: modules/time.md
-      - enums: modules/enums.md
+  - Package Contents:
+      - Core: submodules/index.md
+      - Time: submodules/time.md
+      - Enums: submodules/enums.md
 
 docs_dir: docs
 
@@ -28,6 +29,8 @@ plugins:
             show_source: false
             allow_inspection: false
             find_stubs_package: false
+            show_root_heading: true
+            show_root_full_path: false
           paths:
             - stubs/keplemon
     

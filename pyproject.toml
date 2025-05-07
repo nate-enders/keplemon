@@ -1,11 +1,14 @@
 [project]
 name = "keplemon"
 version = "0.1.0"
-dependencies = ["requests"]
+dependencies = ["requests", "click"]
 
 [project.optional-dependencies]
 dev = ["maturin", "keplemon[test]", "mkdocstrings[python]", "mkdocs-material"]
 test = ["pytest"]
+
+[project.scripts]
+keplemon = "keplemon.__main__:cli"
 
 [tool.maturin]
 python-source = "python"
