@@ -1,7 +1,6 @@
 site_name: KepLemon
-site_url: https://docs.citra.space/keplemon/
-site_dir: site/keplemon
-use_directory_urls: true
+site_url: https://keplemon.citra.space/
+use_directory_urls: false
 
 nav:
   - Home: index.md
@@ -16,9 +15,6 @@ docs_dir: docs
 
 theme:
   name: material
-
-extra:
-  base_url: /keplemon/
 
 plugins:
   - search
