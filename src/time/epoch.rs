@@ -2,6 +2,7 @@ use super::{TimeComponents, TimeSpan};
 use crate::enums::TimeSystem;
 use crate::saal::time_func_interface;
 use pyo3::prelude::*;
+use pyo3::types::PyAny;
 use std::hash::Hash;
 use std::ops::{Add, AddAssign, Sub};
 
@@ -86,6 +87,20 @@ impl Epoch {
         Self {
             days_since_1950: self.days_since_1950 + span.in_days(),
             time_system: self.time_system,
+        }
+    }
+
+    fn __sub__<'py>(&self, other: &Bound<'py, PyAny>, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        if let Ok(other_epoch) = other.extract::<Epoch>() {
+            let result = *self - other_epoch;
+            Ok(Py::new(py, result)?.into_bound(py).into_any())
+        } else if let Ok(other_span) = other.extract::<TimeSpan>() {
+            let result = *self - other_span;
+            Ok(Py::new(py, result)?.into_bound(py).into_any())
+        } else {
+            Err(PyErr::new::<pyo3::exceptions::PyTypeError, _>(
+                "Unsupported operand type for -",
+            ))
         }
     }
 

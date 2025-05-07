@@ -48,6 +48,14 @@ def test_epoch():
     assert ut1.time_system == TimeSystem.UT1
     assert ut1.to_iso() == EXPECTED_UT1_ISO
 
+    one_hour = TimeSpan.from_hours(1)
+    plus_one_hour = from_ds50 + one_hour
+    epoch_diff = plus_one_hour - from_ds50
+    minus_one_hour = plus_one_hour - one_hour
+
+    assert epoch_diff.in_hours() == pytest.approx(1.0)
+    assert minus_one_hour.days_since_1950 == from_ds50.days_since_1950
+
 
 def test_time_span():
 
