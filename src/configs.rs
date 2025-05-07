@@ -1,0 +1,3 @@
+pub const CONJUNCTION_STEP_MINUTES: f64 = 10.0;
+pub const MAX_NEWTON_ITERATIONS: usize = 10;
+pub const NEWTON_TOLERANCE: f64 = 1e-6;

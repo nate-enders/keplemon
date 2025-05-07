@@ -1,0 +1,42 @@
+site_name: KepLemon
+site_url: https://keplemon.citra.space/
+use_directory_urls: false
+
+nav:
+  - Home: index.md
+  - Getting Started: getting_started.md
+  - Package Contents:
+      - Core: submodules/index.md
+      - Time: submodules/time.md
+      - Enums: submodules/enums.md
+  - License: license.md
+
+docs_dir: docs
+
+theme:
+  name: material
+
+plugins:
+  - search
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          options:
+            docstring_style: google
+            show_source: false
+            allow_inspection: false
+            find_stubs_package: false
+            show_root_heading: true
+            show_root_full_path: false
+          paths:
+            - stubs/keplemon
+    
+          
+
+
+markdown_extensions:
+  - admonition
+  - pymdownx.superfences
+  - pymdownx.tabbed
+  - markdown_include.include
