@@ -39,6 +39,6 @@ jobs:
       - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: site
+          path: site/keplemon
 
       - uses: actions/deploy-pages@v4
