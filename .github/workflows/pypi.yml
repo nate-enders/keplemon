@@ -4,6 +4,9 @@ on:
     workflows: ["test"]
     types: [completed]
 
+permissions:
+  id-token: write
+
 jobs:
   publish:
     # only if test succeeded
