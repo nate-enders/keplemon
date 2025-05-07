@@ -1,5 +1,10 @@
 name: Deploy MkDocs site
 
+permissions:
+  contents: read
+  id-token: write
+  pages: write
+
 on:
   push:
     branches:
@@ -25,7 +30,7 @@ jobs:
         run: mkdocs build
 
       - name: Add CNAME for custom domain
-        run: echo 'citra.space/keplemon' > site/CNAME
+        run: echo 'docs.citra.space/keplemon' > site/CNAME
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
