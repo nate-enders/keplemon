@@ -11,7 +11,7 @@ def test_tle():
     assert tle.satellite_id == 25544
     assert tle.designator == "98067A"
     assert tle.classification == Classification.Unclassified
-    assert tle.ephemeris_type == KeplerianType.MeanKozaiGP
+    assert tle.type == KeplerianType.MeanKozaiGP
     assert tle.get_lines() == (line_1, line_2)
 
 

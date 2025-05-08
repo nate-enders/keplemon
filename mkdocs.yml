@@ -4,14 +4,18 @@ use_directory_urls: false
 
 nav:
   - Home: index.md
-  - Getting Started: getting_started.md
-  - Examples:
-      - Propagation: examples/propagation_examples.md
   - Package Contents:
       - Core: submodules/index.md
       - Time: submodules/time.md
       - Enums: submodules/enums.md
       - Bodies: submodules/bodies.md
+      - Elements: submodules/elements.md
+      - Estimation: submodules/estimation.md
+      - Events: submodules/events.md
+  - Examples:
+      - Propagation: examples/propagation_examples.md
+      - Orbit Determination: examples/od_example.md
+      - Close Approaches: examples/ca_examples.md
   - License: license.md
 
 docs_dir: docs

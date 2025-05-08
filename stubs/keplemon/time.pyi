@@ -121,7 +121,7 @@ class TimeComponents:
     def to_iso(self) -> str:
         """
         Returns:
-            Epoch in ISO 8601 format (YYYY-MM-DDThh:mm:ss.sssZ)
+            Epoch in ISO 8601 format (YYYY-MM-DDThh:mm:ss.sss)
         """
         ...
 
@@ -129,7 +129,7 @@ class TimeComponents:
     def from_iso(cls, iso_str: str) -> TimeComponents:
         """
         Args:
-            iso_str: ISO 8601 formatted string (YYYY-MM-DDThh:mm:ss.sssZ)
+            iso_str: ISO 8601 formatted string (YYYY-MM-DDThh:mm:ss.sss)
         """
         ...
 
@@ -158,7 +158,7 @@ class Epoch:
     def from_iso(cls, iso_str: str, time_system: TimeSystem) -> Epoch:
         """
         Args:
-            iso_str: ISO 8601 formatted string (YYYY-MM-DDThh:mm:ss.sssZ)
+            iso_str: ISO 8601 formatted string (YYYY-MM-DDThh:mm:ss.sss)
             time_system: System used to calculate the epoch
         """
         ...
@@ -179,6 +179,7 @@ class Epoch:
 
         !!! note
             DTG formats include:
+
             - DTG 20: YYYY/DDD HHMM SS.SSS
             - DTG 19: YYYYMonDDHHMMSS.SSS
             - DTG 17: YYYY/DDD.DDDDDDDD
@@ -193,7 +194,7 @@ class Epoch:
     def to_iso(self) -> str:
         """
         Returns:
-            Epoch in ISO 8601 format (YYYY-MM-DDThh:mm:ss.sssZ)
+            Epoch in ISO 8601 format (YYYY-MM-DDThh:mm:ss.sss)
         """
         ...
 

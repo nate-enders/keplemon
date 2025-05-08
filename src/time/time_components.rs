@@ -89,7 +89,7 @@ impl TimeComponents {
 
     pub fn to_iso(&self) -> String {
         format!(
-            "{:04}-{:02}-{:02}T{:02}:{:02}:{:.3}",
+            "{:04}-{:02}-{:02}T{:02}:{:02}:{:06.3}",
             self.year, self.month, self.day, self.hour, self.minute, self.second
         )
     }

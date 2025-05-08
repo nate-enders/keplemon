@@ -1,4 +1,4 @@
-use super::{EquinoctialElements, KeplerianElements, KeplerianState};
+use super::{CartesianState, EquinoctialElements, KeplerianElements, KeplerianState};
 use crate::bodies::Satellite;
 use crate::enums::{Classification, KeplerianType, ReferenceFrame};
 use crate::estimation::Observation;
@@ -72,7 +72,7 @@ impl TLE {
     }
 
     pub fn get_equinoctial_elements_at_epoch(&self, epoch: Epoch) -> EquinoctialElements {
-        match self.get_keplerian_type() {
+        match self.get_type() {
             KeplerianType::MeanBrouwerXP => {
                 match sgp4_prop_interface::get_equinoctial_at_ds50(self.key, epoch.days_since_1950) {
                     Ok(equinoctial_elements) => EquinoctialElements::from(equinoctial_elements),
@@ -123,7 +123,7 @@ impl TLE {
                 self.get_epoch(),
                 perturbed_elements,
                 ReferenceFrame::TEME,
-                self.get_keplerian_type(),
+                self.get_type(),
             );
             let tle = TLE::new(
                 self.satellite_id,
@@ -167,9 +167,7 @@ impl TLE {
         if use_srp {
             let mut perturbed_forces = forces_0;
             let epsilon = DEFAULT_EPSILONS[7];
-            if self.get_keplerian_type() == KeplerianType::MeanBrouwerXP
-                || self.get_keplerian_type() == KeplerianType::Osculating
-            {
+            if self.get_type() == KeplerianType::MeanBrouwerXP || self.get_type() == KeplerianType::Osculating {
                 perturbed_forces.set_srp_coefficient(forces_0.get_srp_term() + epsilon);
             } else {
                 perturbed_forces.set_mean_motion_dot(forces_0.get_mean_motion_dot() + epsilon);
@@ -211,7 +209,7 @@ impl TLE {
             self.get_epoch(),
             new_elements.to_keplerian(),
             ReferenceFrame::TEME,
-            self.get_keplerian_type(),
+            self.get_type(),
         );
         TLE::new(
             self.satellite_id,
@@ -302,9 +300,7 @@ impl TLE {
             let mut perturbed_forces = self.force_properties;
             let val = perturbed_forces.get_mean_motion_dot();
             let epsilon = DEFAULT_EPSILONS[7];
-            if self.get_keplerian_type() == KeplerianType::MeanBrouwerXP
-                || self.get_keplerian_type() == KeplerianType::Osculating
-            {
+            if self.get_type() == KeplerianType::MeanBrouwerXP || self.get_type() == KeplerianType::Osculating {
                 perturbed_forces.set_srp_coefficient(perturbed_forces.get_srp_coefficient() + epsilon);
             } else {
                 perturbed_forces.set_mean_motion_dot(val + epsilon);
@@ -339,9 +335,9 @@ impl TLE {
         xa_tle[tle_interface::XA_TLE_OMEGA] = self.get_argument_of_perigee();
         xa_tle[tle_interface::XA_TLE_MNANOM] = self.get_mean_anomaly();
         xa_tle[tle_interface::XA_TLE_MNMOTN] = self.get_mean_motion();
-        xa_tle[tle_interface::XA_TLE_EPHTYPE] = self.get_keplerian_type() as i32 as f64;
+        xa_tle[tle_interface::XA_TLE_EPHTYPE] = self.get_type() as i32 as f64;
 
-        match self.get_keplerian_type() {
+        match self.get_type() {
             KeplerianType::Osculating => {
                 xa_tle[tle_interface::XA_TLE_SP_BTERM] = self.get_b_term();
                 xa_tle[tle_interface::XA_TLE_SP_AGOM] = self.get_agom();
@@ -362,6 +358,10 @@ impl TLE {
     pub fn get_xs_tle(&self) -> String {
         let cls_plus_des = self.classification.as_char().to_string() + &self.designator;
         GetSetString::from_string(&cls_plus_des).value()
+    }
+
+    pub fn get_force_properties(&self) -> ForceProperties {
+        self.force_properties
     }
 
     pub fn remove_from_memory(&mut self) {
@@ -398,6 +398,10 @@ impl TLE {
             false => Some(line_1.trim().to_string()),
         };
         tle
+    }
+
+    pub fn get_keplerian_state(&self) -> KeplerianState {
+        self.keplerian_state
     }
 }
 
@@ -454,7 +458,7 @@ impl TLE {
     }
 
     #[getter]
-    pub fn get_keplerian_type(&self) -> KeplerianType {
+    pub fn get_type(&self) -> KeplerianType {
         self.keplerian_state.get_type()
     }
 
@@ -484,11 +488,6 @@ impl TLE {
     }
 
     #[getter]
-    pub fn get_ephemeris_type(&self) -> KeplerianType {
-        self.keplerian_state.get_type()
-    }
-
-    #[getter]
     pub fn get_epoch(&self) -> Epoch {
         self.keplerian_state.get_epoch()
     }
@@ -509,13 +508,8 @@ impl TLE {
     }
 
     #[getter]
-    pub fn get_force_properties(&self) -> ForceProperties {
-        self.force_properties
-    }
-
-    #[getter]
-    pub fn get_keplerian_state(&self) -> KeplerianState {
-        self.keplerian_state
+    fn get_cartesian_state(&self) -> CartesianState {
+        self.keplerian_state.to_cartesian()
     }
 }
 
@@ -610,7 +604,7 @@ mod tests {
         assert_eq!(tle.get_mean_motion_dot_dot(), 0.0);
         assert_eq!(tle.get_agom(), 0.0);
         assert_eq!(tle.get_b_term(), 0.0);
-        assert_eq!(tle.get_keplerian_type(), KeplerianType::MeanKozaiGP);
+        assert_eq!(tle.get_type(), KeplerianType::MeanKozaiGP);
         assert_eq!(tle.classification, Classification::Unclassified);
         assert_eq!(tle.designator, "98067A");
     }
@@ -630,7 +624,7 @@ mod tests {
         assert_eq!(tle.get_mean_motion_dot_dot(), 0.0);
         assert_abs_diff_eq!(tle.get_agom(), 0.01);
         assert_abs_diff_eq!(tle.get_b_term(), 0.02);
-        assert_eq!(tle.get_keplerian_type(), KeplerianType::MeanBrouwerXP);
+        assert_eq!(tle.get_type(), KeplerianType::MeanBrouwerXP);
         assert_eq!(tle.classification, Classification::Unclassified);
         assert_eq!(tle.designator, "98067A");
     }

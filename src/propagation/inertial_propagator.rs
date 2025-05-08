@@ -74,7 +74,7 @@ impl InertialPropagator {
                             epoch,
                             elements,
                             ReferenceFrame::TEME,
-                            tle.get_keplerian_type(),
+                            tle.get_type(),
                         ))
                     }
                     Err(_) => None,
@@ -171,7 +171,7 @@ impl InertialPropagator {
                 for i in 0..new_els.len() {
                     elements[i] = new_els[i];
                 }
-                let state = KeplerianState::new(epoch, elements, ReferenceFrame::TEME, tle.get_keplerian_type());
+                let state = KeplerianState::new(epoch, elements, ReferenceFrame::TEME, tle.get_type());
                 Ok(Self::from_tle(TLE::new(
                     tle.get_satellite_id(),
                     tle.get_name(),

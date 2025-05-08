@@ -2,7 +2,7 @@ use std::vec;
 
 use super::ObservationResidual;
 use crate::bodies::{Satellite, Sensor};
-use crate::elements::{CartesianState, CartesianVector, TopocentricElements};
+use crate::elements::{CartesianVector, TopocentricElements};
 use crate::saal::{astro_func_interface, sat_state_interface};
 
 use crate::time::Epoch;
@@ -158,21 +158,6 @@ impl Observation {
     #[setter]
     pub fn set_observed_satellite_id(&mut self, observed_satellite_id: i32) {
         self.observed_satellite_id = Some(observed_satellite_id);
-    }
-
-    fn get_teme_estimate(&self, a_priori_state: CartesianState) -> CartesianState {
-        let sensor_to_satellite = a_priori_state.position - self.observer_teme_position;
-        let r = match self.get_range() {
-            Some(r) => r,
-            None => sensor_to_satellite.get_magnitude(),
-        };
-        let teme_estimate = self.observer_teme_position + (self.observed_teme_topocentric.get_observed_direction() * r);
-        CartesianState::new(
-            a_priori_state.epoch,
-            teme_estimate,
-            a_priori_state.velocity,
-            a_priori_state.get_frame(),
-        )
     }
 
     pub fn get_residual(&self, satellite: &Satellite) -> Option<ObservationResidual> {
