@@ -5,7 +5,7 @@ dependencies = ["requests", "click"]
 description = "Citra Space Corporation's Rust-accelerated astrodynamics library."
 authors = [{ name = "Brandon Sexton", email = "brandon@citra.space" }]
 license = "MIT"
-requires-python = ">=3.9"
+requires-python = ">=3.6"
 
 [project.urls]
 Documentation = "https://keplemon.citra.space"
