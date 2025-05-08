@@ -164,9 +164,7 @@ class Epoch:
         ...
 
     @classmethod
-    def from_components(
-        cls, components: TimeComponents, time_system: TimeSystem
-    ) -> Epoch:
+    def from_components(cls, components: TimeComponents, time_system: TimeSystem) -> Epoch:
         """
         Args:
             components: Epoch represented as individual components

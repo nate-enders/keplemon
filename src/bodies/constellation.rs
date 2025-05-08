@@ -12,7 +12,7 @@ use std::collections::HashMap;
 #[derive(Default)]
 pub struct Constellation {
     name: Option<String>,
-    satellites: HashMap<String, Satellite>,
+    satellites: HashMap<i32, Satellite>,
 }
 
 #[pymethods]
@@ -29,7 +29,7 @@ impl Constellation {
     pub fn from_tle_catalog(catalog: TLECatalog) -> Self {
         let mut constellation = Constellation::new();
         for satellite_id in catalog.keys() {
-            if let Some(tle) = catalog.get(satellite_id.clone()) {
+            if let Some(tle) = catalog.get(satellite_id) {
                 let sat = Satellite::from_tle(tle);
                 constellation.add(satellite_id, sat);
             }
@@ -38,12 +38,12 @@ impl Constellation {
         constellation
     }
 
-    pub fn get_states_at_epoch(&self, epoch: Epoch) -> HashMap<String, Option<CartesianState>> {
+    pub fn get_states_at_epoch(&self, epoch: Epoch) -> HashMap<i32, Option<CartesianState>> {
         self.satellites
             .par_iter()
             .map(|(satellite_id, sat)| {
                 let state = sat.get_state_at_epoch(epoch);
-                (satellite_id.clone(), state)
+                (*satellite_id, state)
             })
             .collect()
     }
@@ -101,12 +101,12 @@ impl Constellation {
             .into_par_iter()
             .flat_map(|i| {
                 let pri_ephem = &ephem_list[i];
-                let pri_sat = &self.satellites.get(&pri_ephem.get_satellite_id().to_string()).unwrap();
+                let pri_sat = &self.satellites.get(&pri_ephem.get_satellite_id()).unwrap();
                 (i + 1..num)
                     .into_par_iter()
                     .filter_map(|j| {
                         let sec_ephem = &ephem_list[j];
-                        let sec_sat = &self.satellites.get(&sec_ephem.get_satellite_id().to_string()).unwrap();
+                        let sec_sat = &self.satellites.get(&sec_ephem.get_satellite_id()).unwrap();
                         if pri_sat.get_apoapsis()? < sec_sat.get_periapsis()? - distance_threshold
                             || sec_sat.get_apoapsis()? < pri_sat.get_periapsis()? - distance_threshold
                             || pri_sat.get_periapsis()? > sec_sat.get_apoapsis()? + distance_threshold
@@ -128,25 +128,35 @@ impl Constellation {
         start_epoch: Epoch,
         end_epoch: Epoch,
         step_size: TimeSpan,
-    ) -> HashMap<String, Option<Ephemeris>> {
+    ) -> HashMap<i32, Option<Ephemeris>> {
         self.satellites
             .par_iter()
             .map(|(satellite_id, sat)| {
                 let ephemeris = sat.get_ephemeris(start_epoch, end_epoch, step_size);
-                (satellite_id.clone(), ephemeris)
+                (*satellite_id, ephemeris)
             })
             .collect()
     }
 
-    pub fn add(&mut self, satellite_id: String, sat: Satellite) {
+    fn __getitem__(&self, satellite_id: i32) -> PyResult<Satellite> {
+        match self.get(satellite_id) {
+            Some(sat) => Ok(sat),
+            None => Err(pyo3::exceptions::PyKeyError::new_err(format!(
+                "Invalid key: {}",
+                satellite_id
+            ))),
+        }
+    }
+
+    pub fn add(&mut self, satellite_id: i32, sat: Satellite) {
         self.satellites.insert(satellite_id, sat);
     }
 
-    pub fn get(&self, satellite_id: String) -> Option<Satellite> {
+    pub fn get(&self, satellite_id: i32) -> Option<Satellite> {
         self.satellites.get(&satellite_id).cloned()
     }
 
-    pub fn remove(&mut self, satellite_id: String) {
+    pub fn remove(&mut self, satellite_id: i32) {
         self.satellites.remove(&satellite_id);
     }
 

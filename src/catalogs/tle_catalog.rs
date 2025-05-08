@@ -8,7 +8,7 @@ use std::io::{BufRead, BufReader};
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct TLECatalog {
     name: Option<String>,
-    map: HashMap<String, TLE>,
+    map: HashMap<i32, TLE>,
 }
 
 #[pymethods]
@@ -22,23 +22,33 @@ impl TLECatalog {
     }
 
     pub fn add(&mut self, tle: TLE) {
-        self.map.insert(tle.get_satellite_id().to_string(), tle);
+        self.map.insert(tle.get_satellite_id(), tle);
     }
 
-    pub fn keys(&self) -> Vec<String> {
+    pub fn keys(&self) -> Vec<i32> {
         self.map.keys().cloned().collect()
     }
 
-    pub fn get(&self, satellite_id: String) -> Option<TLE> {
+    pub fn get(&self, satellite_id: i32) -> Option<TLE> {
         self.map.get(&satellite_id).cloned()
     }
 
-    pub fn remove(&mut self, satellite_id: String) {
+    pub fn remove(&mut self, satellite_id: i32) {
         self.map.remove(&satellite_id);
     }
 
     pub fn clear(&mut self) {
         self.map.clear();
+    }
+
+    fn __getitem__(&self, satellite_id: i32) -> PyResult<TLE> {
+        match self.map.get(&satellite_id) {
+            Some(tle) => Ok(tle.clone()),
+            None => Err(pyo3::exceptions::PyKeyError::new_err(format!(
+                "Invalid key: {}",
+                satellite_id
+            ))),
+        }
     }
 
     #[getter]

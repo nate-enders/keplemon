@@ -5,6 +5,8 @@ use_directory_urls: false
 nav:
   - Home: index.md
   - Getting Started: getting_started.md
+  - Examples:
+      - Propagation: examples/propagation_examples.md
   - Package Contents:
       - Core: submodules/index.md
       - Time: submodules/time.md
