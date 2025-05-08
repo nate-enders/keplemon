@@ -30,7 +30,7 @@ jobs:
 
       - name: Build site
         run: |
-          PYTHONPATH=stubs mkdocs build --clean
+          PYTHONPATH=stubs mkdocs build --clean --verbose
 
       - name: Add CNAME for custom domain
         run: echo 'keplemon.citra.space' > site/CNAME

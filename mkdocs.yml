@@ -9,6 +9,7 @@ nav:
       - Core: submodules/index.md
       - Time: submodules/time.md
       - Enums: submodules/enums.md
+      - Bodies: submodules/bodies.md
   - License: license.md
 
 docs_dir: docs
@@ -39,4 +40,5 @@ markdown_extensions:
   - admonition
   - pymdownx.superfences
   - pymdownx.tabbed
-  - markdown_include.include
+  - markdown_include.include:
+      base_path: docs

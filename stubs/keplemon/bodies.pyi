@@ -6,15 +6,37 @@ from keplemon.events import CloseApproach, CloseApproachReport
 
 class Earth:
     @staticmethod
-    def get_equatorial_radius() -> float: ...
+    def get_equatorial_radius() -> float:
+        """
+        Returns:
+            Equatorial radius of the Earth in kilometers
+        """
+        ...
+
     @staticmethod
     def get_kem() -> float: ...
 
 class Satellite:
     satellite_id: int
+    """Number used to distinguish the satellite from other objects.
+    
+    !!! note
+        Every attempt should be made to make this unique to support satellite methods that perform comparisons or
+        bookkeeping.
+    """
     name: str | None
+    """Human-readable name of the satellite"""
+
     @classmethod
-    def from_tle(cls, tle: TLE) -> Satellite: ...
+    def from_tle(cls, tle: TLE) -> Satellite:
+        """
+        Instantiate a Satellite from a legacy TLE
+
+        Args:
+            tle: Two-line element set for the satellite
+        """
+        ...
+
     def get_close_approach(
         self,
         other: Satellite,
