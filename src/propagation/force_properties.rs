@@ -1,10 +1,8 @@
+use crate::configs;
 use crate::elements::B_STAR_TO_B_TERM;
 use crate::enums::KeplerianType;
 use crate::saal::tle_interface;
 use pyo3::prelude::*;
-
-pub const DEFAULT_SRP_TERM: f64 = 0.03;
-pub const DEFAULT_DRAG_TERM: f64 = 0.01;
 
 #[pyclass]
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -21,9 +19,9 @@ pub struct ForceProperties {
 impl Default for ForceProperties {
     fn default() -> Self {
         Self {
-            srp_coefficient: DEFAULT_SRP_TERM,
+            srp_coefficient: configs::DEFAULT_SRP_TERM,
             srp_area: 1.0,
-            drag_coefficient: DEFAULT_DRAG_TERM,
+            drag_coefficient: configs::DEFAULT_DRAG_TERM,
             drag_area: 1.0,
             mass: 1.0,
             mean_motion_dot: 0.0,

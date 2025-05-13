@@ -274,9 +274,8 @@ impl TLE {
         // drag
         if use_drag {
             let mut perturbed_forces = self.force_properties;
-            let val = perturbed_forces.get_drag_coefficient();
             let epsilon = DEFAULT_EPSILONS[6];
-            perturbed_forces.set_drag_coefficient(val + epsilon);
+            perturbed_forces.set_drag_coefficient(perturbed_forces.get_drag_coefficient() + epsilon);
             let perturbed_tle = TLE::new(
                 self.satellite_id,
                 self.name.clone(),
@@ -298,13 +297,8 @@ impl TLE {
         //srp or mean motion dot
         if use_srp {
             let mut perturbed_forces = self.force_properties;
-            let val = perturbed_forces.get_mean_motion_dot();
             let epsilon = DEFAULT_EPSILONS[7];
-            if self.get_type() == KeplerianType::MeanBrouwerXP || self.get_type() == KeplerianType::Osculating {
-                perturbed_forces.set_srp_coefficient(perturbed_forces.get_srp_coefficient() + epsilon);
-            } else {
-                perturbed_forces.set_mean_motion_dot(val + epsilon);
-            }
+            perturbed_forces.set_srp_coefficient(perturbed_forces.get_srp_coefficient() + epsilon);
             let perturbed_tle = TLE::new(
                 self.satellite_id,
                 self.name.clone(),
@@ -416,6 +410,7 @@ impl TLE {
         }
     }
 
+    #[getter]
     pub fn get_lines(&self) -> (String, String) {
         let xa_tle = self.get_xa_tle();
         let xs_tle = self.get_xs_tle();

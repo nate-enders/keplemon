@@ -95,7 +95,8 @@ class TLE:
         """
         ...
 
-    def get_lines(self) -> tuple[str, str]:
+    @property
+    def lines(self) -> tuple[str, str]:
         """
         !!! note
             If the TLE was created in the 3LE format, only lines 2 and 3 will be returned.  The name must be accessed

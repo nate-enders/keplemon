@@ -53,6 +53,7 @@ impl Satellite {
             Some(ref propagator) => {
                 new_satellite.inertial_propagator = Some(propagator.new_with_delta_x(delta_x, use_drag, use_srp)?);
                 new_satellite.keplerian_state = Some(propagator.get_keplerian_state().unwrap());
+                new_satellite.force_properties = propagator.get_force_properties().unwrap();
             }
             None => return Err("Inertial propagator is not set".to_string()),
         };
@@ -72,6 +73,19 @@ impl Satellite {
             keplerian_state: None,
             inertial_propagator: None,
         }
+    }
+
+    pub fn to_tle(&self) -> Option<TLE> {
+        self.keplerian_state.as_ref().map(|state| {
+            TLE::new(
+                self.satellite_id,
+                self.name.clone(),
+                Classification::Unclassified,
+                "".to_string(),
+                *state,
+                self.force_properties,
+            )
+        })
     }
 
     #[staticmethod]
@@ -141,6 +155,29 @@ impl Satellite {
                 Ok(())
             }
         }
+    }
+
+    #[setter]
+    pub fn set_force_properties(&mut self, force_properties: ForceProperties) {
+        self.force_properties = force_properties;
+        if let Some(state) = self.get_keplerian_state() {
+            if state.get_type() != KeplerianType::Osculating {
+                let tle = TLE::new(
+                    self.satellite_id,
+                    self.name.clone(),
+                    Classification::Unclassified,
+                    "".to_string(),
+                    state,
+                    force_properties,
+                );
+                self.inertial_propagator = Some(InertialPropagator::from_tle(tle));
+            }
+        }
+    }
+
+    #[getter]
+    pub fn get_force_properties(&self) -> ForceProperties {
+        self.force_properties
     }
 
     pub fn get_ephemeris(&self, start_epoch: Epoch, end_epoch: Epoch, step: TimeSpan) -> Option<Ephemeris> {

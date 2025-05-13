@@ -1,5 +1,6 @@
 use super::{Covariance, Observation, ObservationResidual};
 use crate::bodies::Satellite;
+use crate::configs;
 use crate::enums::{CovarianceType, KeplerianType};
 use crate::time::Epoch;
 use nalgebra::{DMatrix, DVector};
@@ -72,9 +73,6 @@ impl BatchLeastSquares {
     fn set_output_type(&mut self, output_keplerian_type: KeplerianType) {
         self.output_keplerian_type = output_keplerian_type;
         self.reset();
-        let mut kep_state = self.current_estimate.get_keplerian_state().unwrap();
-        kep_state.set_type(output_keplerian_type);
-        self.current_estimate.set_keplerian_state(kep_state).unwrap();
     }
 
     #[getter]
@@ -194,11 +192,41 @@ impl BatchLeastSquares {
     }
 
     fn reset(&mut self) {
-        self.current_estimate = self.a_priori.clone();
+        self.current_estimate = Satellite::new(self.a_priori.get_satellite_id());
+        if let Some(name) = self.a_priori.get_name() {
+            self.current_estimate.set_name(name);
+        }
         self.iteration_count = 0;
         self.converged = false;
         self.delta_x = None;
         self.weighted_rms = None;
+
+        let mut force_properties = self.a_priori.get_force_properties();
+
+        // Seed SRP if not already set
+        if self.get_estimate_srp() && force_properties.get_srp_coefficient() == 0.0 {
+            force_properties.set_srp_coefficient(configs::DEFAULT_SRP_TERM);
+            force_properties.set_srp_area(1.0);
+        }
+
+        // Seed drag if not already set
+        if self.get_estimate_drag() && force_properties.get_drag_coefficient() == 0.0 {
+            force_properties.set_drag_coefficient(configs::DEFAULT_DRAG_TERM);
+        }
+        self.current_estimate.set_force_properties(force_properties);
+
+        // Seed orbit state
+        let mut kep_state = self.a_priori.get_keplerian_state().unwrap();
+        kep_state.set_type(self.output_keplerian_type);
+        self.current_estimate.set_keplerian_state(kep_state).unwrap();
+
+        // Disable SRP estimation if output type is incompatible
+        if self.use_srp
+            && (self.output_keplerian_type == KeplerianType::MeanBrouwerGP
+                || self.output_keplerian_type == KeplerianType::MeanKozaiGP)
+        {
+            self.use_srp = false;
+        }
     }
 
     #[getter]

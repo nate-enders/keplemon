@@ -12,7 +12,7 @@ def test_tle():
     assert tle.designator == "98067A"
     assert tle.classification == Classification.Unclassified
     assert tle.type == KeplerianType.MeanKozaiGP
-    assert tle.get_lines() == (line_1, line_2)
+    assert tle.lines == (line_1, line_2)
 
 
 def test_keplerian_state():

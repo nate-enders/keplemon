@@ -1,3 +1,4 @@
+use super::ForceProperties;
 use crate::elements::{CartesianState, CartesianVector, KeplerianState, TLE};
 use crate::enums::{ReferenceFrame, TimeSystem};
 use crate::estimation::Observation;
@@ -88,6 +89,16 @@ impl InertialPropagator {
     pub fn get_keplerian_state(&self) -> PyResult<KeplerianState> {
         match &self.tle {
             Some(tle) => Ok(tle.get_keplerian_state()),
+            None => Err(pyo3::exceptions::PyRuntimeError::new_err(
+                "Propagation of osculating elements has not been implemented",
+            )),
+        }
+    }
+
+    #[getter]
+    pub fn get_force_properties(&self) -> PyResult<ForceProperties> {
+        match &self.tle {
+            Some(tle) => Ok(tle.get_force_properties()),
             None => Err(pyo3::exceptions::PyRuntimeError::new_err(
                 "Propagation of osculating elements has not been implemented",
             )),

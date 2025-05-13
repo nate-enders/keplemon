@@ -51,6 +51,13 @@ class Satellite:
         step: TimeSpan,
     ) -> Ephemeris: ...
     def get_state_at_epoch(self, epoch: Epoch) -> CartesianState: ...
+    def to_tle(self) -> TLE | None:
+        """
+        Returns:
+            Satellite as a two-line element set or None if no state is loaded
+
+        """
+        ...
 
 class Constellation:
     """
