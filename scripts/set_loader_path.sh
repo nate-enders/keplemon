@@ -28,5 +28,5 @@ for lib in ./lib/mac/amd/*.dylib; do
   codesign --force --sign "Developer ID Application: Brandon Sexton (AR7B22KF2Q)" "$lib"
 done
 
-find lib/linux/amd -name '*.so' -exec patchelf --set-rpath '$ORIGIN' {} +
-find lib/linux/arm -name '*.so' -exec patchelf --set-rpath '$ORIGIN' {} +
+find lib/linux/amd -name '*.so*' -exec patchelf --set-rpath '$ORIGIN' {} +
+find lib/linux/arm -name '*.so*' -exec patchelf --set-rpath '$ORIGIN' {} +
