@@ -1,6 +1,7 @@
 site_name: KepLemon
 site_url: https://keplemon.citra.space/
 use_directory_urls: false
+repo_url: https://github.com/citra-space/keplemon
 
 nav:
   - Home: index.md
