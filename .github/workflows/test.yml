@@ -59,6 +59,11 @@ jobs:
           toolchain: stable
           override: true
 
+      - name: Install musl toolchain and dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install musl-tools -y
+
       - name: Install dependencies
         run: |
           cargo install --locked cargo-make
