@@ -10,7 +10,7 @@ jobs:
     runs-on: windows-latest
 
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
     steps:
@@ -42,7 +42,6 @@ jobs:
 
   test-linux-amd:
     runs-on: ubuntu-latest
-    container: ghcr.io/pyo3/maturin:musllinux-x86_64
     strategy:
       fail-fast: false
       matrix:
@@ -69,6 +68,7 @@ jobs:
       - name: Test build
         run: |
           cargo make copy-linux-amd
+          export PKG_CONFIG_ALLOW_CROSS=1
           maturin build --release --strip --target x86_64-unknown-linux-musl --compatibility musllinux_1_2 -i python${{ matrix.python-version }}
 
       - name: Upload wheel
