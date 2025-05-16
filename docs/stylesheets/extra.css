@@ -1,0 +1,33 @@
+:root  > * {
+  --md-primary-fg-color:        #02c2ed;
+  --md-primary-bg-color:        #ffffff;
+
+  --md-accent-fg-color:        #ffdb3e;
+  --md-accent-bg-color:        #683c11;
+}
+
+.md-typeset .admonition.note,
+.md-typeset details.note {
+  border-color: #02c2ed;
+}
+.md-typeset .note > .admonition-title,
+.md-typeset .note > summary {
+  background-color: #02c2ed;
+  color: #ffffff;
+}
+.md-typeset .note > .admonition-title::before,
+.md-typeset .note > summary::before {
+  background-color: transparent;
+  content: "";
+  display: inline-block;
+  background-image: url("../images/logo.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 1.5em;
+  height: 1.5em;
+  vertical-align: middle;
+  mask: none; /* disable mask */
+}
+
+/*yellow==ffdb3e green==9aba37 brown==683c11 */

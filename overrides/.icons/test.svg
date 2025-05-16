@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" width="500" height="500" version="1.1" viewBox="0 0 500 500">
+  <!-- Generator: Adobe Illustrator 29.3.0, SVG Export Plug-In . SVG Version: 2.1.0 Build 146)  -->
+  <defs>
+    <style>
+      .st0 {
+        fill: #9aba37;
+      }
+
+      .st1 {
+        fill: #eea202;
+      }
+
+      .st2 {
+        fill: #fff;
+      }
+
+      .st3 {
+        fill: #ffdb3e;
+      }
+
+      .st4 {
+        fill: #683c11;
+      }
+    </style>
+  </defs>
+  <rect class="st2" width="500" height="500"/>
+  <g>
+    <rect x="221.3" y="336.2" width="57.4" height="28.7"/>
+    <rect x="192.6" y="307.4" width="28.7" height="28.8"/>
+    <rect x="278.7" y="307.4" width="28.7" height="28.8"/>
+    <rect x="307.4" y="221.3" width="28.7" height="86.2"/>
+    <rect x="163.8" y="221.3" width="28.7" height="86.2"/>
+    <rect x="192.6" y="192.5" width="28.7" height="28.7"/>
+    <rect x="221.3" y="163.8" width="57.4" height="28.7"/>
+    <rect x="278.7" y="192.5" width="28.7" height="28.7"/>
+    <rect class="st4" x="250" y="135.1" width="28.7" height="28.7"/>
+    <polygon class="st3" points="307.4 221.3 307.4 307.4 278.7 307.4 278.7 336.2 221.3 336.2 221.3 307.4 192.6 307.4 192.6 221.3 221.3 221.3 221.3 192.5 278.7 192.5 278.7 221.3 307.4 221.3"/>
+    <rect class="st0" x="278.7" y="135.1" width="57.4" height="57.4"/>
+    <rect class="st2" x="221.3" y="192.5" width="28.7" height="28.7"/>
+    <rect class="st2" x="192.6" y="221.3" width="28.7" height="28.7"/>
+    <polygon class="st1" points="307.5 250 307.5 307.4 278.7 307.4 278.7 336.1 221.3 336.1 221.3 307.4 250 307.4 250 278.7 278.7 278.7 278.7 250 307.5 250"/>
+  </g>
+</svg>

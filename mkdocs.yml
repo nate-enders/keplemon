@@ -22,7 +22,20 @@ nav:
 docs_dir: docs
 
 theme:
+  custom_dir: overrides
   name: material
+  font:
+    text: Montserrat
+  logo: images/banner.png
+  icon:
+    menu: logo
+  favicon: images/favicon.png
+  palette:
+    scheme: default
+    primary: custom
+    accent: custom
+extra_css:
+  - stylesheets/extra.css
 
 plugins:
   - search
@@ -39,9 +52,6 @@ plugins:
             show_root_full_path: false
           paths:
             - stubs/keplemon
-    
-          
-
 
 markdown_extensions:
   - admonition
@@ -49,3 +59,8 @@ markdown_extensions:
   - pymdownx.tabbed
   - markdown_include.include:
       base_path: docs
+
+extra:
+  admonition:
+    icons:
+      note: null

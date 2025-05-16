@@ -48,12 +48,16 @@ dependencies = ["copy-mac-amd"]
 
 [tasks.build-linux-arm]
 description = "Build the wheel for Linux ARM"
-script = ["maturin build --release"]
+script = [
+    "maturin build --release --strip --target aarch64-unknown-linux-musl --compatibility musllinux_1_2",
+]
 dependencies = ["copy-linux-arm"]
 
 [tasks.build-linux-amd]
 description = "Build the wheel for Linux AMD"
-script = ["maturin build --release"]
+script = [
+    "maturin build --release --strip --target x86_64-unknown-linux-musl --compatibility musllinux_1_2",
+]
 dependencies = ["copy-linux-amd"]
 
 
