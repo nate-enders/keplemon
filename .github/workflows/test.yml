@@ -42,6 +42,7 @@ jobs:
 
   test-linux-amd:
     runs-on: ubuntu-latest
+    container: ghcr.io/pyo3/maturin:musllinux-x86_64
     strategy:
       fail-fast: false
       matrix:
