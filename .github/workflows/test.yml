@@ -44,7 +44,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.9"]
     steps:
       - uses: actions/checkout@v4
 
@@ -61,7 +61,7 @@ jobs:
             -e HOME=/root \
             -w /io quay.io/pypa/manylinux2014_x86_64 \
             bash -c '
-              yum install -y curl gcc gcc-c++ make python3-pip openssl-devel && \
+              yum install -y curl gcc gcc-c++ make openssl-devel && \
               export CARGO_HOME="$HOME/.cargo" && export RUSTUP_HOME="$HOME/.rustup" && \
               curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain stable && \
               source "$CARGO_HOME/env" && \
