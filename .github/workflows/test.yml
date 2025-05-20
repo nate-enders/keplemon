@@ -60,7 +60,10 @@ jobs:
           override: true
 
       - name: Install Docker (if not preinstalled)
-        run: sudo apt-get update && sudo apt-get install -y docker.io
+        run: |
+          sudo apt-get update
+          sudo apt-get remove -y containerd docker docker-engine docker.io
+          sudo apt-get install -y docker.io
 
       - name: Build wheel in manylinux container
         run: |
