@@ -56,18 +56,21 @@ jobs:
 
       - name: Build for ${{ matrix.python-version }}
         run: |
-          docker run --rm -v ${{ github.workspace }}:/io -w /io \
-            quay.io/pypa/manylinux2014_x86_64 bash -c "
-              # install Rust & maturin
-              yum install -y curl gcc gcc-c++ make && \
+          docker run --rm \
+            -v ${{ github.workspace }}:/io \
+            -e HOME=/root \
+            -w /io quay.io/pypa/manylinux2014_x86_64 \
+            bash -c '
+              yum install -y curl gcc gcc-c++ make python3-pip && \
+              export CARGO_HOME="$HOME/.cargo" && export RUSTUP_HOME="$HOME/.rustup" && \
               curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain stable && \
-              source $HOME/.cargo/env && \
-              python${{ matrix.python-version}} -m pip install maturin && \
-              # use the matrix’d interpreter
+              source "$CARGO_HOME/env" && \
+              cargo install --locked cargo-make && \
+              cargo make copy-linux-amd && \
               python${{ matrix.python-version}} -m pip install --upgrade pip setuptools wheel && \
               python${{ matrix.python-version}} -m pip install '.[dev]' && \
-              /python${{ matrix.python-version}} -m -m maturin build --release --compatibility manylinux2014
-            "
+              python${{ matrix.python-version}} -m -m maturin build --release --compatibility manylinux2014
+            '
 
       - name: Upload wheel
         uses: actions/upload-artifact@v4
