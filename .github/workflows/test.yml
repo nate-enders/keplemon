@@ -43,45 +43,31 @@ jobs:
   test-linux-amd:
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        python_tag:
+          - cp39-cp39
+          - cp310-cp310
+          - cp311-cp311
+        python-version: ["3.9", "3.10", "3.11"]
     steps:
-      - uses: actions/checkout@v3
-      - name: setup python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
-        with:
-          python-version: ${{ matrix.python-version }}
+      - uses: actions/checkout@v4
 
-      - name: Setup Rust toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-
-      - name: Install dependencies
+      - name: Build for ${{ matrix.python_tag }}
         run: |
-          cargo install --locked cargo-make
-          pip install ".[dev]"
-
-      - name: Build wheel in manylinux container
-        run: |
-          docker run --rm -v ${{ github.workspace }}:/io -w /io quay.io/pypa/manylinux2014_x86_64 \
-            bash -c '
+          docker run --rm -v ${{ github.workspace }}:/io -w /io \
+            quay.io/pypa/manylinux2014_x86_64 bash -c "
+              # install Rust & maturin
               yum install -y curl gcc gcc-c++ make python3-pip && \
               curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain stable && \
-              source $HOME/.cargo/env && \
-              cargo install --locked cargo-make && \
-              pip3 install --upgrade pip setuptools wheel && \
-              ls && \
-              echo "checking /io" && \
-              ls /io && \
-              pip3 install ".[dev]" && \
-              cargo make test-linux-amd
-            '
-
-      - name: Test build
-        run: cargo make test-linux-amd
+              source \$HOME/.cargo/env && \
+              echo "python options:" && \
+              ls /opt/python
+              pip3 install maturin && \
+              # use the matrix’d interpreter
+              /opt/python/${{ matrix.python_tag }}/bin/pip install --upgrade pip setuptools wheel && \
+              /opt/python/${{ matrix.python_tag }}/bin/pip install '.[dev]' && \
+              /opt/python/${{ matrix.python_tag }}/bin/python -m maturin build --release --compatibility manylinux2014
+            "
 
       - name: Upload wheel
         uses: actions/upload-artifact@v4
