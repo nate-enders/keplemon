@@ -12,8 +12,8 @@
 }
 .md-typeset .note > .admonition-title,
 .md-typeset .note > summary {
-  background-color: #02c2ed;
-  color: #ffffff;
+  background-color: #02c2ed80;
+  color: #000000;
 }
 .md-typeset .note > .admonition-title::before,
 .md-typeset .note > summary::before {
@@ -21,6 +21,31 @@
   content: "";
   display: inline-block;
   background-image: url("../images/logo.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 1.5em;
+  height: 1.5em;
+  vertical-align: middle;
+  mask: none; /* disable mask */
+}
+
+
+.md-typeset .admonition.warning,
+.md-typeset details.warning {
+  border-color: #eea202;
+}
+.md-typeset .warning > .admonition-title,
+.md-typeset .warning > summary {
+  background-color: #eea20280;
+  color: #683c11;
+}
+.md-typeset .warning > .admonition-title::before,
+.md-typeset .warning > summary::before {
+  background-color: transparent;
+  content: "";
+  display: inline-block;
+  background-image: url("../images/warning-sign.svg");
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
