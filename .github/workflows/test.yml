@@ -66,15 +66,15 @@ jobs:
 
       - name: Build wheel in manylinux container
         run: |
-          docker run --rm -v ${{ github.workspace }}:/io quay.io/pypa/manylinux2014_x86_64 \
-            bash -c "
+          docker run --rm -v ${{ github.workspace }}:/io -w /io quay.io/pypa/manylinux2014_x86_64 \
+            bash -c '
               yum install -y curl gcc gcc-c++ make python3-pip && \
               curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain stable && \
-              source \$HOME/.cargo/env && \
+              source $HOME/.cargo/env && \
               cargo install --locked cargo-make && \
-              cd /io && pip3 install .[dev] && \
+              pip3 install ".[dev]" && \
               cargo make test-linux-amd
-            "
+            '
 
       - name: Test build
         run: cargo make test-linux-amd
