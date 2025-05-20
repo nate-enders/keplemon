@@ -20,7 +20,7 @@ dev = [
     "mkdocstrings[python]",
     "mkdocs-material",
     "markdown-include",
-    "tomllib",
+    "tomli; python_version < '3.11'",
 ]
 test = ["pytest"]
 
