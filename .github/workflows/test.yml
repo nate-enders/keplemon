@@ -61,7 +61,7 @@ jobs:
             -e HOME=/root \
             -w /io quay.io/pypa/manylinux2014_x86_64 \
             bash -c '
-              yum install -y curl gcc gcc-c++ make python3-pip && \
+              yum install -y curl gcc gcc-c++ make python3-pip openssl-devel && \
               export CARGO_HOME="$HOME/.cargo" && export RUSTUP_HOME="$HOME/.rustup" && \
               curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain stable && \
               source "$CARGO_HOME/env" && \
@@ -69,7 +69,7 @@ jobs:
               cargo make copy-linux-amd && \
               python${{ matrix.python-version}} -m pip install --upgrade pip setuptools wheel && \
               python${{ matrix.python-version}} -m pip install '.[dev]' && \
-              python${{ matrix.python-version}} -m -m maturin build --release --compatibility manylinux2014
+              OPENSSL_DIR=/usr/local python${{ matrix.python-version}} -m -m maturin build --release --compatibility manylinux2014
             '
 
       - name: Upload wheel
