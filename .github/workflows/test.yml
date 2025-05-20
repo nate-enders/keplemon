@@ -42,8 +42,6 @@ jobs:
 
   test-linux-amd:
     runs-on: ubuntu-latest
-    container:
-      image: quay.io/pypa/manylinux2014_x86_64
     strategy:
       fail-fast: false
       matrix:
