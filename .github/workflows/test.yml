@@ -69,7 +69,7 @@ jobs:
               cargo make copy-linux-amd && \
               python${{ matrix.python-version}} -m pip install --upgrade pip setuptools wheel && \
               python${{ matrix.python-version}} -m pip install '.[dev]' && \
-              OPENSSL_DIR=/usr/local python${{ matrix.python-version}} -m -m maturin build --release --compatibility manylinux2014
+              OPENSSL_DIR=/usr/local python${{ matrix.python-version}} -m maturin build --release --compatibility manylinux2014
             '
 
       - name: Upload wheel
