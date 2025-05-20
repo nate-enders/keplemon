@@ -68,7 +68,9 @@ jobs:
         run: |
           docker run --rm -v ${{ github.workspace }}:/io quay.io/pypa/manylinux2014_x86_64 \
             bash -c "
-              yum install -y python3-pip && \
+              yum install -y curl gcc gcc-c++ make python3-pip && \
+              curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain stable && \
+              source \$HOME/.cargo/env && \
               cargo install --locked cargo-make && \
               pip3 install '.[dev]' && \
               cd /io && \
