@@ -61,16 +61,20 @@ jobs:
           toolchain: stable
           override: true
 
-      - name: Install musl toolchain and dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install musl-tools -y
+      - name: Install Docker (if not preinstalled)
+        run: sudo apt-get update && sudo apt-get install -y docker.io
 
-      - name: Install dependencies
+      - name: Build wheel in manylinux container
         run: |
-          cargo install --locked cargo-make
-          rustup target add x86_64-unknown-linux-musl
-          pip install ".[dev]"
+          docker run --rm -v ${{ github.workspace }}:/io quay.io/pypa/manylinux2014_x86_64 \
+            bash -c "
+              yum install -y python3-pip && \
+              pip3 install maturin && \
+              cargo install --locked cargo-make && \
+              pip3 install '.[dev]' && \
+              cd /io && \
+              cargo make test-linux-amd
+            "
 
       - name: Test build
         run: cargo make test-linux-amd
