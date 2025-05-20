@@ -58,11 +58,11 @@ jobs:
             quay.io/pypa/manylinux2014_x86_64 bash -c "
               # install Rust & maturin
               yum install -y curl gcc gcc-c++ make python3-pip && \
-              curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain stable && \
-              source $HOME/.cargo/env && \
               which python3 && \
               which pip3 && \
               ls /opt/python && \
+              curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain stable && \
+              source /$HOME/.cargo/env && \
               pip3 install maturin && \
               # use the matrix’d interpreter
               /opt/python/${{ matrix.python_tag }}/bin/pip install --upgrade pip setuptools wheel && \
