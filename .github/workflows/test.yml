@@ -69,7 +69,6 @@ jobs:
           docker run --rm -v ${{ github.workspace }}:/io quay.io/pypa/manylinux2014_x86_64 \
             bash -c "
               yum install -y python3-pip && \
-              pip3 install maturin && \
               cargo install --locked cargo-make && \
               pip3 install '.[dev]' && \
               cd /io && \
