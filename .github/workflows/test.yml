@@ -72,8 +72,7 @@ jobs:
               curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain stable && \
               source \$HOME/.cargo/env && \
               cargo install --locked cargo-make && \
-              pip3 install '.[dev]' && \
-              cd /io && \
+              cd /io && pip3 install .[dev] && \
               cargo make test-linux-amd
             "
 
