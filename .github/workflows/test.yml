@@ -59,11 +59,10 @@ jobs:
           toolchain: stable
           override: true
 
-      - name: Install Docker (if not preinstalled)
+      - name: Install dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get remove -y containerd docker docker-engine docker.io
-          sudo apt-get install -y docker.io
+          cargo install --locked cargo-make
+          pip install ".[dev]"
 
       - name: Build wheel in manylinux container
         run: |
