@@ -66,13 +66,14 @@ jobs:
               curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain stable && \
               source "$CARGO_HOME/env" && \
               cargo install --locked cargo-make && \
+              cargo install --locked maturin && \
               cargo make copy-linux-amd && \
               PYTHON_VERSION=${{ matrix.python-version }} && \
               TAG=${PYTHON_VERSION//./} && \
               PY_BIN=/opt/python/cp${TAG}-cp${TAG}/bin/python && \
               PIP="${PY_BIN%/python}/pip" && \
-              $PIP install --upgrade pip setuptools wheel maturin auditwheel && \
-              OPENSSL_DIR=/usr/local $PY_BIN -m maturin build --release --compatibility manylinux2014
+              $PIP install --upgrade pip setuptools wheel auditwheel && \
+              OPENSSL_DIR=/usr/local maturin build --release --compatibility manylinux2014 -i $PY_BIN
             '
 
       - name: Upload wheel
