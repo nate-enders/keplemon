@@ -67,9 +67,9 @@ jobs:
               source "$CARGO_HOME/env" && \
               cargo install --locked cargo-make && \
               cargo install --locked maturin && \
-              export OPENSSL_DIR=/usr/local && \
-              export OPENSSL_LIB_DIR=/usr/local/lib && \
-              export OPENSSL_INCLUDE_DIR=/usr/local/include && \
+              export OPENSSL_DIR=/usr && \
+              export OPENSSL_LIB_DIR=/usr/lib64 && \
+              export OPENSSL_INCLUDE_DIR=/usr/include && \
               cargo make copy-linux-amd && \
               PYTHON_VERSION=${{ matrix.python-version }} && \
               TAG=${PYTHON_VERSION//./} && \
