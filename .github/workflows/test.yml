@@ -67,14 +67,16 @@ jobs:
               source "$CARGO_HOME/env" && \
               cargo install --locked cargo-make && \
               cargo install --locked maturin && \
-              export OPENSSL_DIR=/usr/local && export OPENSSL_LIB_DIR=/usr/local/lib64 && \
+              export OPENSSL_DIR=/usr/local && \
+              export OPENSSL_LIB_DIR=/usr/local/lib && \
+              export OPENSSL_INCLUDE_DIR=/usr/local/include && \
               cargo make copy-linux-amd && \
               PYTHON_VERSION=${{ matrix.python-version }} && \
               TAG=${PYTHON_VERSION//./} && \
               PY_BIN=/opt/python/cp${TAG}-cp${TAG}/bin/python && \
               PIP="${PY_BIN%/python}/pip" && \
               $PIP install --upgrade pip setuptools wheel auditwheel && \
-              OPENSSL_DIR=/usr/local maturin build --release --compatibility manylinux2014 -i $PY_BIN
+              maturin build --release --compatibility manylinux2014 -i $PY_BIN
             '
 
       - name: Upload wheel
