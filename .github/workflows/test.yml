@@ -61,12 +61,13 @@ jobs:
             -e HOME=/root \
             -w /io quay.io/pypa/manylinux2014_x86_64 \
             bash -c '
-              yum install -y curl gcc gcc-c++ make openssl-devel && \
+              yum install -y curl gcc gcc-c++ make openssl-devel openssl && \
               export CARGO_HOME="$HOME/.cargo" && export RUSTUP_HOME="$HOME/.rustup" && \
               curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain stable && \
               source "$CARGO_HOME/env" && \
               cargo install --locked cargo-make && \
               cargo install --locked maturin && \
+              export OPENSSL_DIR=/usr/local && export OPENSSL_LIB_DIR=/usr/local/lib64 && \
               cargo make copy-linux-amd && \
               PYTHON_VERSION=${{ matrix.python-version }} && \
               TAG=${PYTHON_VERSION//./} && \

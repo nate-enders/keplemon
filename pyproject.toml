@@ -15,6 +15,7 @@ Issues = "https://github.com/citra-space/keplemon/issues"
 
 [project.optional-dependencies]
 dev = [
+    "maturin>=1.0,<2.0",
     "keplemon[test]",
     "mkdocstrings[python]",
     "mkdocs-material",
