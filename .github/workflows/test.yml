@@ -67,8 +67,12 @@ jobs:
               source "$CARGO_HOME/env" && \
               cargo install --locked cargo-make && \
               cargo make copy-linux-amd && \
-              python${{ matrix.python-version}} -m pip install --upgrade pip setuptools wheel auditwheel maturin && \
-              OPENSSL_DIR=/usr/local python${{ matrix.python-version}} -m maturin build --release --compatibility manylinux2014
+              PYTHON_VERSION=${{ matrix.python-version }} && \
+              TAG=${PYTHON_VERSION//./} && \
+              PY_BIN=/opt/python/cp${TAG}-cp${TAG}/bin/python && \
+              PIP="${PY_BIN%/python}/pip" && \
+              $PIP install --upgrade pip setuptools wheel maturin auditwheel && \
+              OPENSSL_DIR=/usr/local $PY_BIN -m maturin build --release --compatibility manylinux2014
             '
 
       - name: Upload wheel
