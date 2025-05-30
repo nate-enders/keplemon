@@ -4,6 +4,8 @@ RUN yum install -y openssl-devel
 
 ENV PATH="/opt/python/cp310-cp310/bin:$PATH"
 
+RUN cargo install cargo-make
+
 WORKDIR /io
 
 COPY . .
