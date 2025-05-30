@@ -7,9 +7,8 @@ services:
         OS: ${OS:-linux}
         ARCH: ${ARCH:-amd}
         PYTHON_VERSION: ${PYTHON_VERSION:-310}
-    image: citra-space/keplemon:0.0.1
+    image: citra-space/keplemon:latest
     container_name: keplemon
-
     environment:
       - OS=${OS:-linux}
       - ARCH=${ARCH:-amd}

@@ -2,7 +2,11 @@ FROM ghcr.io/pyo3/maturin:latest
 
 RUN yum install -y openssl-devel
 
-ENV PATH="/opt/python/cp310-cp310/bin:$PATH"
+ARG OS
+ARG ARCH
+ARG PYTHON_VERSION
+
+ENV PATH="/opt/python/cp${PYTHON_VERSION}-cp${PYTHON_VERSION}/bin:$PATH"
 
 RUN cargo install cargo-make
 
@@ -10,7 +14,7 @@ WORKDIR /io
 
 COPY . .
 
-RUN maturin build --release --compatibility manylinux2014 -i python
+RUN cargo make build-${OS}-${ARCH}
 
 RUN pip install --upgrade pip setuptools wheel auditwheel pytest
 
