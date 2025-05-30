@@ -1,0 +1,17 @@
+services:
+  keplemon:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        OS: ${OS:-linux}
+        ARCH: ${ARCH:-amd}
+        PYTHON_VERSION: ${PYTHON_VERSION:-310}
+    image: citra-space/keplemon:0.0.1
+    container_name: keplemon
+
+    environment:
+      - OS=${OS:-linux}
+      - ARCH=${ARCH:-amd}
+      - PYTHON_VERSION=${PYTHON_VERSION:-310}
+    command: tail -f /dev/null
