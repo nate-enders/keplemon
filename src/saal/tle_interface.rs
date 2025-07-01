@@ -649,12 +649,8 @@ pub fn lines_to_arrays(line_1: &str, line_2: &str) -> Result<([f64; XA_TLE_SIZE]
 }
 
 #[inline]
-pub fn remove_from_memory(sat_key: i64) -> Result<(), String> {
-    let result = unsafe { TleRemoveSat(sat_key) };
-    match result {
-        0 => Ok(()),
-        _ => Err(main_interface::get_last_error_message()),
-    }
+pub fn remove_from_memory(sat_key: i64) {
+    unsafe { TleRemoveSat(sat_key) };
 }
 
 #[inline]

@@ -2,6 +2,7 @@ pub mod astro_func_interface;
 pub mod env_const_interface;
 pub mod ext_ephem_interface;
 pub mod main_interface;
+pub mod obs_interface;
 pub mod sat_state_interface;
 pub mod sgp4_prop_interface;
 pub mod time_func_interface;

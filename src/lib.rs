@@ -36,7 +36,10 @@ fn set_thread_count(count: usize) {
 fn _keplemon(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(get_thread_count, m)?)?;
     m.add_function(wrap_pyfunction!(set_thread_count, m)?)?;
+    m.add_function(wrap_pyfunction!(saal::sgp4_prop_interface::set_license_file_path, m)?)?;
+    m.add_function(wrap_pyfunction!(saal::sgp4_prop_interface::get_license_file_path, m)?)?;
     saal::register_saal(m)?;
+    saal::obs_interface::register_obs_interface(m)?;
     enums::register_enums(m)?;
     time::register_time(m)?;
     elements::register_elements(m)?;

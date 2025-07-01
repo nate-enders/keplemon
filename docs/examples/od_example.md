@@ -50,7 +50,10 @@ bls = BatchLeastSquares(keplemon_obs, sat)
 bls.output_type = KeplerianType.MeanBrouwerXP
 
 # This will iterate until the weighted RMS tolerance is achieved OR max iterations is achieved
-bls.solve()
+try:
+    bls.solve()
+except RuntimeError as e:
+    print(e)
 ```
 
 ## Plotting OD Results

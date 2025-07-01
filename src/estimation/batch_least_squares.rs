@@ -58,7 +58,12 @@ impl BatchLeastSquares {
                 .new_with_delta_x(self.delta_x.as_ref().unwrap(), self.use_drag, self.use_srp)
             {
                 Ok(new_estimate) => new_estimate,
-                Err(e) => return Err(pyo3::exceptions::PyRuntimeError::new_err(e)),
+                Err(e) => {
+                    return Err(pyo3::exceptions::PyRuntimeError::new_err(format!(
+                        "Unable to solve orbit state. {}",
+                        e
+                    )))
+                }
             };
 
         Ok(())

@@ -75,17 +75,32 @@ impl Satellite {
         }
     }
 
-    pub fn to_tle(&self) -> Option<TLE> {
-        self.keplerian_state.as_ref().map(|state| {
-            TLE::new(
+    pub fn to_tle(&self) -> PyResult<Option<TLE>> {
+        match self.get_keplerian_state() {
+            Some(state) => match TLE::new(
                 self.satellite_id,
                 self.name.clone(),
                 Classification::Unclassified,
                 "".to_string(),
-                *state,
+                state,
                 self.force_properties,
-            )
-        })
+            ) {
+                Ok(tle) => Ok(Some(tle)),
+                Err(e) => Err(PyErr::new::<PyValueError, _>(e.to_string())),
+            },
+            None => Ok(None),
+        }
+
+        // self.keplerian_state.as_ref().map(|state| {
+        //     TLE::new(
+        //         self.satellite_id,
+        //         self.name.clone(),
+        //         Classification::Unclassified,
+        //         "".to_string(),
+        //         *state,
+        //         self.force_properties,
+        //     )
+        // })
     }
 
     #[staticmethod]
@@ -150,7 +165,8 @@ impl Satellite {
                     "".to_string(),
                     keplerian_state,
                     self.force_properties,
-                );
+                )
+                .unwrap();
                 self.inertial_propagator = Some(InertialPropagator::from_tle(tle));
                 Ok(())
             }
@@ -169,7 +185,8 @@ impl Satellite {
                     "".to_string(),
                     state,
                     force_properties,
-                );
+                )
+                .unwrap();
                 self.inertial_propagator = Some(InertialPropagator::from_tle(tle));
             }
         }

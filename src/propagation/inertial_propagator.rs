@@ -164,7 +164,7 @@ impl InertialPropagator {
     pub fn new_with_delta_x(&self, delta_x: &DVector<f64>, use_drag: bool, use_srp: bool) -> Result<Self, String> {
         match &self.tle {
             Some(tle) => {
-                let new_tle = tle.new_with_delta_x(delta_x, use_drag, use_srp);
+                let new_tle = tle.new_with_delta_x(delta_x, use_drag, use_srp)?;
                 Ok(Self::from_tle(new_tle))
             }
             None => Err("Propagation of osculating elements has not been implemented".to_string()),
@@ -190,7 +190,7 @@ impl InertialPropagator {
                     tle.get_designator(),
                     state,
                     tle.get_force_properties(),
-                )))
+                )?))
             }
             None => Err("Propagation of osculating elements has not been implemented".to_string()),
         }

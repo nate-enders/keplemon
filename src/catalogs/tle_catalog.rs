@@ -67,7 +67,7 @@ impl TLECatalog {
     }
 
     #[staticmethod]
-    pub fn from_tle_file(file_path: &str) -> Self {
+    pub fn from_tle_file(file_path: &str) -> PyResult<TLECatalog> {
         let mut catalog = TLECatalog::default();
         let file = File::open(file_path).expect("Unable to open file");
         let reader = BufReader::new(file);
@@ -81,11 +81,16 @@ impl TLECatalog {
             let tle = match num_chunks {
                 3 => TLE::from_lines(&chunk[0], &chunk[1], Some(&chunk[2])),
                 2 => TLE::from_lines(&chunk[0], &chunk[1], None),
-                _ => panic!("Invalid TLE format"),
+                _ => {
+                    return Err(pyo3::exceptions::PyValueError::new_err(format!(
+                        "Invalid TLE line count of {} in {}",
+                        num_chunks, file_path
+                    )));
+                }
             };
-            catalog.add(tle);
+            catalog.add(tle?);
         }
         catalog.name = Some(file_path.to_string());
-        catalog
+        Ok(catalog)
     }
 }

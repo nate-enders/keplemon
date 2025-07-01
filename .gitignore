@@ -11,4 +11,5 @@ python/keplemon/*.so
 python/keplemon/*.dll
 python/keplemon/*.lib
 python/keplemon/*.pyi
+python/keplemon/saal/*.pyi
 site/

@@ -1,6 +1,6 @@
 [project]
 name = "keplemon"
-version = "0.1.9"
+version = "0.2.0"
 dependencies = ["requests", "click"]
 description = "Citra Space Corporation's Rust-accelerated astrodynamics library."
 authors = [{ name = "Brandon Sexton", email = "brandon@citra.space" }]
@@ -31,6 +31,7 @@ keplemon = "keplemon.__main__:cli"
 python-source = "python"
 module-name = "keplemon._keplemon"
 include = ["keplemon/*"]
+generate-stub = false
 
 [build-system]
 requires = ["maturin>=1.0,<2.0"]

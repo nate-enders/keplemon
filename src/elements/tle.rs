@@ -40,7 +40,7 @@ impl Clone for TLE {
             keplerian_state: self.keplerian_state,
             force_properties: self.force_properties,
         };
-        tle.load_to_memory();
+        tle.load_to_memory().unwrap();
         tle
     }
 }
@@ -53,7 +53,7 @@ impl TLE {
         designator: String,
         keplerian_state: KeplerianState,
         force_properties: ForceProperties,
-    ) -> Self {
+    ) -> Result<Self, String> {
         let mut tle = Self {
             key: 0,
             satellite_id,
@@ -63,8 +63,10 @@ impl TLE {
             keplerian_state,
             force_properties,
         };
-        tle.load_to_memory();
-        tle
+        match tle.load_to_memory() {
+            Ok(_) => Ok(tle),
+            Err(e) => Err(e),
+        }
     }
 
     pub fn get_key(&self) -> i64 {
@@ -132,7 +134,8 @@ impl TLE {
                 self.designator.clone(),
                 perturbed_state,
                 forces_0,
-            );
+            )
+            .unwrap();
 
             let perturbed_els = tle.get_equinoctial_elements_at_epoch(epoch);
             for j in 0..6 {
@@ -153,7 +156,8 @@ impl TLE {
                 self.designator.clone(),
                 state_0,
                 perturbed_forces,
-            );
+            )
+            .unwrap();
 
             let perturbed_els = tle.get_equinoctial_elements_at_epoch(epoch);
             for j in 0..6 {
@@ -180,7 +184,8 @@ impl TLE {
                 self.designator.clone(),
                 state_0,
                 perturbed_forces,
-            );
+            )
+            .unwrap();
 
             let perturbed_els = tle.get_equinoctial_elements_at_epoch(epoch);
             for j in 0..6 {
@@ -191,7 +196,7 @@ impl TLE {
         Ok(stm)
     }
 
-    pub fn new_with_delta_x(&self, delta_x: &DVector<f64>, use_drag: bool, use_srp: bool) -> Self {
+    pub fn new_with_delta_x(&self, delta_x: &DVector<f64>, use_drag: bool, use_srp: bool) -> Result<TLE, String> {
         let mut new_elements = self.get_equinoctial_elements_at_epoch(self.get_epoch());
 
         for i in 0..6 {
@@ -211,14 +216,17 @@ impl TLE {
             ReferenceFrame::TEME,
             self.get_type(),
         );
-        TLE::new(
+        match TLE::new(
             self.satellite_id,
             self.name.clone(),
             self.classification,
             self.designator.clone(),
             new_state,
             forces,
-        )
+        ) {
+            Ok(tle) => Ok(tle),
+            Err(e) => Err(e),
+        }
     }
 
     pub fn get_jacobian(&self, ob: &Observation, use_drag: bool, use_srp: bool) -> Result<DMatrix<f64>, String> {
@@ -260,7 +268,8 @@ impl TLE {
                 self.designator.clone(),
                 perturbed_state,
                 self.force_properties,
-            );
+            )
+            .unwrap();
             let perturbed_sat = Satellite::from_tle(perturbed_tle);
             let h_p = ob.get_predicted_vector(&perturbed_sat)?;
 
@@ -283,7 +292,8 @@ impl TLE {
                 self.designator.clone(),
                 ref_state,
                 perturbed_forces,
-            );
+            )
+            .unwrap();
             let perturbed_sat = Satellite::from_tle(perturbed_tle);
             let h_p = ob.get_predicted_vector(&perturbed_sat)?;
 
@@ -306,7 +316,8 @@ impl TLE {
                 self.designator.clone(),
                 ref_state,
                 perturbed_forces,
-            );
+            )
+            .unwrap();
             let perturbed_sat = Satellite::from_tle(perturbed_tle);
             let h_p = ob.get_predicted_vector(&perturbed_sat)?;
 
@@ -359,39 +370,53 @@ impl TLE {
     }
 
     pub fn remove_from_memory(&mut self) {
-        tle_interface::remove_from_memory(self.key).unwrap();
+        tle_interface::remove_from_memory(self.key);
         self.key = 0;
     }
 
-    pub fn load_to_memory(&mut self) {
+    pub fn load_to_memory(&mut self) -> Result<(), String> {
         let xa_tle = self.get_xa_tle();
         let xs_tle = self.get_xs_tle();
-        self.key = tle_interface::load_from_arrays(xa_tle, &xs_tle).unwrap();
+        match tle_interface::load_from_arrays(xa_tle, &xs_tle) {
+            Ok(key) => {
+                self.key = key;
+                Ok(())
+            }
+            Err(e) => Err(e),
+        }
     }
 
-    pub fn from_two_lines(line_1: &str, line_2: &str) -> Self {
+    pub fn from_two_lines(line_1: &str, line_2: &str) -> Result<TLE, String> {
         let (xa_tle, xs_tle) = tle_interface::lines_to_arrays(line_1, line_2).unwrap();
         let cls_char = &xs_tle[tle_interface::XS_TLE_SECCLASS_0_1..tle_interface::XS_TLE_SECCLASS_0_1 + 1];
         let designator = &xs_tle[tle_interface::XS_TLE_SATNAME_1_12..tle_interface::XS_TLE_SATNAME_1_12 + 12];
         let keplerian_state = KeplerianState::from_xa_tle(&xa_tle);
         let force_properties = ForceProperties::from_xa_tle(&xa_tle);
-        Self::new(
+        match Self::new(
             xa_tle[tle_interface::XA_TLE_SATNUM] as i32,
             None,
             Classification::from_str(cls_char).unwrap(),
             designator.trim().to_string(),
             keplerian_state,
             force_properties,
-        )
+        ) {
+            Ok(tle) => Ok(tle),
+            Err(e) => Err(e),
+        }
     }
 
-    pub fn from_three_lines(line_1: &str, line_2: &str, line_3: &str) -> Self {
-        let mut tle = Self::from_two_lines(line_2, line_3);
-        tle.name = match line_1.starts_with("0 ") {
-            true => Some(line_1[2..].trim().to_string()),
-            false => Some(line_1.trim().to_string()),
-        };
-        tle
+    pub fn from_three_lines(line_1: &str, line_2: &str, line_3: &str) -> Result<TLE, String> {
+        let tle = Self::from_two_lines(line_2, line_3);
+        match tle {
+            Ok(mut tle) => {
+                tle.name = match line_1.starts_with("0 ") {
+                    true => Some(line_1[2..].trim().to_string()),
+                    false => Some(line_1.trim().to_string()),
+                };
+                Ok(tle)
+            }
+            Err(e) => Err(e),
+        }
     }
 
     pub fn get_keplerian_state(&self) -> KeplerianState {
@@ -403,10 +428,14 @@ impl TLE {
 impl TLE {
     #[staticmethod]
     #[pyo3(signature = (line_1, line_2, line_3 = None))]
-    pub fn from_lines(line_1: &str, line_2: &str, line_3: Option<&str>) -> Self {
-        match line_3 {
+    pub fn from_lines(line_1: &str, line_2: &str, line_3: Option<&str>) -> PyResult<TLE> {
+        let tle = match line_3 {
             Some(line_3) => Self::from_three_lines(line_1, line_2, line_3),
             None => Self::from_two_lines(line_1, line_2),
+        };
+        match tle {
+            Ok(tle) => Ok(tle),
+            Err(e) => Err(pyo3::exceptions::PyValueError::new_err(e)),
         }
     }
 
@@ -523,7 +552,7 @@ mod tests {
     const XP_LINE_2: &str = "2 25544  51.6443  93.0000 0001400  84.0000 276.0000 15.4930007023660";
 
     fn xp_tle_from_lines() -> TLE {
-        TLE::from_lines(XP_LINE_1, XP_LINE_2, None)
+        TLE::from_lines(XP_LINE_1, XP_LINE_2, None).unwrap()
     }
 
     fn xp_tle_from_fields() -> TLE {
@@ -550,10 +579,11 @@ mod tests {
             keplerian_state,
             force_properties,
         )
+        .unwrap()
     }
 
     fn sgp_tle_from_lines() -> TLE {
-        TLE::from_lines(SGP_LINE_1, SGP_LINE_2, None)
+        TLE::from_lines(SGP_LINE_1, SGP_LINE_2, None).unwrap()
     }
 
     fn sgp_tle_from_fields() -> TLE {
@@ -581,6 +611,7 @@ mod tests {
             keplerian_state,
             force_properties,
         )
+        .unwrap()
     }
 
     #[test]
@@ -643,7 +674,7 @@ mod tests {
     #[test]
     fn test_load_sgp_to_memory() {
         let mut tle = sgp_tle_from_fields();
-        tle.load_to_memory();
+        tle.load_to_memory().unwrap();
         assert_ne!(tle.get_key(), 0);
         tle.remove_from_memory();
     }
@@ -651,7 +682,7 @@ mod tests {
     #[test]
     fn test_load_xp_to_memory() {
         let mut tle = xp_tle_from_fields();
-        tle.load_to_memory();
+        tle.load_to_memory().unwrap();
         assert_ne!(tle.get_key(), 0);
         tle.remove_from_memory();
     }

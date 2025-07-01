@@ -1,7 +1,8 @@
 // This wrapper file was generated automatically by the GenDllWrappers program.
 #![allow(non_snake_case)]
 #![allow(dead_code)]
-use super::main_interface;
+use super::{main_interface, GetSetString};
+use pyo3::prelude::*;
 use std::os::raw::c_char;
 
 extern "C" {
@@ -169,6 +170,12 @@ extern "C" {
     pub fn Sgp4ReepochTLE(satKey: i64, reEpochDs50UTC: f64, line1Out: *const c_char, line2Out: *const c_char) -> i32;
     //  Reepochs a loaded TLE, represented by the satKey, to a new epoch in Csv format.
     pub fn Sgp4ReepochCsv(satKey: i64, reEpochDs50UTC: f64, csvLine: *const c_char) -> i32;
+    //  Sets path to the Sgp4 Open License file if the license file
+    //  Note: This function has been revised since v9.6. It's only needed if the "SGP4_Open_License.txt" isn't located in current folder or those folders specified in PATH/LD_LIBRARY_PATH environment
+    pub fn Sgp4SetLicFilePath(licFilePath: *const c_char);
+    //  Gets the current path to the Sgp4 Open License file
+    //  Note: This function has been revised since v9.6. It's only needed if the "SGP4_Open_License.txt" isn't located in current folder or those folders specified in PATH/LD_LIBRARY_PATH environment
+    pub fn Sgp4GetLicFilePath(licFilePath: *const c_char);
     //  Generates ephemerides for the input satellite, represented by its satKey, for the specified time span and step size
     //  Notes: if arrSize isn't big enough to store all the ephemeris points, the function will exit when the ephemArr reaches
     //  that many points (arrSize) and the errCode is set to IDX_ERR_WARN
@@ -405,4 +412,17 @@ pub fn get_equinoctial_at_ds50(sat_key: i64, ds50_utc: f64) -> Result<[f64; 6], 
         0 => Ok(xa_eqnx),
         _ => Err(main_interface::get_last_error_message()),
     }
+}
+
+#[pyfunction]
+pub fn set_license_file_path(lic_file_path: &str) {
+    let mut c_str = GetSetString::from_string(lic_file_path);
+    unsafe { Sgp4SetLicFilePath(c_str.pointer()) };
+}
+
+#[pyfunction]
+pub fn get_license_file_path() -> String {
+    let mut c_str = GetSetString::new();
+    unsafe { Sgp4GetLicFilePath(c_str.pointer()) };
+    c_str.value().trim().to_string()
 }

@@ -28,3 +28,23 @@ Path to the default time constants file required by the SAAL binaries
 !!! warning
     This path should never be modified and is only exposed to allow inspection of current data.
 """
+
+#: Path to the license file
+LICENSE_PATH: Path
+"""Path to the license file required by the SAAL binaries"""
+
+def set_license_file_path(path: str) -> None:
+    """
+    Set the path to the license file required by the SAAL binaries
+
+    Args:
+        path: Path to the SGP4 license file
+    """
+    ...
+
+def get_license_file_path() -> str:
+    """
+    Returns:
+        Path to the SGP4 license file
+    """
+    ...
