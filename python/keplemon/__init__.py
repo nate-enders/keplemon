@@ -6,19 +6,16 @@ from keplemon._keplemon import (  # type: ignore
     get_license_file_path,
 )
 from pathlib import Path
-from shutil import copyfile
 
-current_dir = Path(__file__).parent
 
-# Copy the license file to the current working directory if it doesn't exist
-LICENSE_PATH = current_dir / "SGP4_Open_License.txt"
-local_path = Path.cwd() / "SGP4_Open_License.txt"
-if not local_path.exists():
-    copyfile(LICENSE_PATH, local_path)
-set_license_file_path(LICENSE_PATH.as_posix())
+PACKAGE_DIRECTORY = Path(__file__).parent
+ASSETS_DIRECTORY = PACKAGE_DIRECTORY / "assets"
+
+# Set the license file directory to the package directory
+set_license_file_path(ASSETS_DIRECTORY.as_posix())
 
 # Load the time constants from the assets directory
-TIME_CONSTANTS_PATH = current_dir / "assets" / "time_constants.dat"
+TIME_CONSTANTS_PATH = ASSETS_DIRECTORY / "time_constants.dat"
 load_time_constants(TIME_CONSTANTS_PATH.as_posix())
 
 __all__ = [
@@ -26,6 +23,7 @@ __all__ = [
     "set_thread_count",
     "TIME_CONSTANTS_PATH",
     "set_license_file_path",
-    "LICENSE_PATH",
+    "PACKAGE_DIRECTORY",
+    "ASSETS_DIRECTORY",
     "get_license_file_path",
 ]

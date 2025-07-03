@@ -29,9 +29,13 @@ Path to the default time constants file required by the SAAL binaries
     This path should never be modified and is only exposed to allow inspection of current data.
 """
 
-#: Path to the license file
-LICENSE_PATH: Path
-"""Path to the license file required by the SAAL binaries"""
+#: Path to the parent directory of the package
+PACKAGE_DIRECTORY: Path
+"""Path to the parent directory of the package"""
+
+#: Path to the assets directory containing supporting data files for the package
+ASSETS_DIRECTORY: Path
+"""Path to the assets directory containing supporting data files for the package"""
 
 def set_license_file_path(path: str) -> None:
     """
