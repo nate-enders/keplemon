@@ -3,6 +3,8 @@ mod cartesian_vector;
 mod ephemeris;
 mod equinoctial_elements;
 mod geodetic_position;
+mod horizon_elements;
+mod horizon_state;
 mod keplerian_elements;
 mod keplerian_state;
 mod spherical_vector;
@@ -14,6 +16,8 @@ pub use cartesian_vector::CartesianVector;
 pub use ephemeris::Ephemeris;
 pub use equinoctial_elements::EquinoctialElements;
 pub use geodetic_position::GeodeticPosition;
+pub use horizon_elements::HorizonElements;
+pub use horizon_state::HorizonState;
 pub use keplerian_elements::KeplerianElements;
 pub use keplerian_state::KeplerianState;
 use pyo3::prelude::*;
@@ -36,6 +40,8 @@ pub fn register_elements(parent_module: &Bound<'_, PyModule>) -> PyResult<()> {
     elements.add_class::<TopocentricElements>()?;
     elements.add_class::<EquinoctialElements>()?;
     elements.add_class::<GeodeticPosition>()?;
+    elements.add_class::<HorizonElements>()?;
+    elements.add_class::<HorizonState>()?;
     py_run!(
         parent_module.py(),
         elements,

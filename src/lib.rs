@@ -5,6 +5,7 @@ pub mod elements;
 pub mod enums;
 pub mod estimation;
 pub mod events;
+pub mod exceptions;
 pub mod propagation;
 pub mod saal;
 pub mod time;
@@ -40,6 +41,8 @@ fn _keplemon(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(saal::sgp4_prop_interface::get_license_file_path, m)?)?;
     saal::register_saal(m)?;
     saal::obs_interface::register_obs_interface(m)?;
+    saal::astro_func_interface::register_astro_func_interface(m)?;
+    saal::time_func_interface::register_time_func_interface(m)?;
     enums::register_enums(m)?;
     time::register_time(m)?;
     elements::register_elements(m)?;
@@ -48,5 +51,6 @@ fn _keplemon(m: &Bound<'_, PyModule>) -> PyResult<()> {
     bodies::register_bodies(m)?;
     events::register_events(m)?;
     estimation::register_estimation(m)?;
+    exceptions::register_exceptions(m)?;
     Ok(())
 }

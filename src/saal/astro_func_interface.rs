@@ -1,14 +1,15 @@
 // This wrapper file was generated automatically by the GenDllWrappers program.
 #![allow(non_snake_case)]
 #![allow(dead_code)]
+use pyo3::prelude::*;
+use pyo3::py_run;
 use std::os::raw::c_char;
-
-use crate::elements::CartesianState;
-use crate::elements::CartesianVector;
-use crate::elements::TopocentricElements;
 
 use super::time_func_interface;
 use super::GetSetString;
+use crate::elements::CartesianState;
+use crate::elements::CartesianVector;
+use crate::elements::TopocentricElements;
 
 extern "C" {
     //  Notes: This function has been deprecated since v9.0.
@@ -731,17 +732,14 @@ pub fn topo_epoch_to_date(ds50_in: f64, ra: f64, dec: f64, ds50_out: f64) -> (f6
 }
 
 pub fn teme_to_topocentric(sensor_teme: CartesianVector, observed_teme: CartesianState) -> TopocentricElements {
-    let theta = observed_teme.epoch.to_fk5_greenwich_angle();
-    let mut llh = [0.0; 3];
-    unsafe {
-        XYZToLLH(theta, &sensor_teme.into(), &mut llh);
-    }
-
+    let theta_g = observed_teme.epoch.to_fk5_greenwich_angle();
+    let lla = theta_teme_to_lla(theta_g, &observed_teme.position.into());
+    let theta = theta_g + lla[1].to_radians();
     let mut xa_topo = [0.0; XA_TOPO_SIZE];
     unsafe {
         ECIToTopoComps(
             theta,
-            llh[0],
+            lla[0],
             &sensor_teme.into(),
             &observed_teme.position.into(),
             &observed_teme.velocity.into(),
@@ -794,4 +792,112 @@ pub fn covariance_uvw_to_teme(pos: &[f64; 3], vel: &[f64; 3], cov_uvw: &[[f64; 6
         CovMtxUVWToECI(pos, vel, cov_uvw, &mut cov_teme);
     }
     cov_teme
+}
+
+pub fn ra_dec_to_az_el(theta: f64, lat: f64, long: f64, ra: f64, dec: f64) -> [f64; 2] {
+    let mut az = 0.0;
+    let mut el = 0.0;
+    unsafe {
+        RaDecToAzEl(theta, lat, long, ra, dec, &mut az, &mut el);
+    }
+
+    [az, el]
+}
+
+#[pyfunction(name = "ra_dec_to_az_el")]
+pub fn py_ra_dec_to_az_el(theta: f64, lat: f64, long: f64, ra: f64, dec: f64) -> [f64; 2] {
+    ra_dec_to_az_el(theta, lat, long, ra, dec)
+}
+
+pub fn ra_dec_to_az_el_time(ds50_utc: f64, lat: f64, long: f64, ra: f64, dec: f64) -> [f64; 2] {
+    let mut az = 0.0;
+    let mut el = 0.0;
+    unsafe {
+        RaDecToAzElTime(ds50_utc, lat, long, ra, dec, &mut az, &mut el);
+    }
+
+    [az, el]
+}
+
+#[pyfunction(name = "ra_dec_to_az_el_time")]
+pub fn py_ra_dec_to_az_el_time(ds50_utc: f64, lat: f64, long: f64, ra: f64, dec: f64) -> [f64; 2] {
+    ra_dec_to_az_el_time(ds50_utc, lat, long, ra, dec)
+}
+
+pub fn theta_teme_to_lla(theta: f64, teme_pos: &[f64; 3]) -> [f64; 3] {
+    let mut pos_lla = [0.0; 3];
+    unsafe {
+        XYZToLLH(theta, teme_pos, &mut pos_lla);
+    }
+    pos_lla
+}
+
+#[pyfunction(name = "theta_teme_to_lla")]
+pub fn py_theta_teme_to_lla(theta: f64, teme_pos: [f64; 3]) -> [f64; 3] {
+    theta_teme_to_lla(theta, &teme_pos)
+}
+
+pub fn time_teme_to_lla(ds50utc: f64, teme_pos: &[f64; 3]) -> [f64; 3] {
+    let mut pos_lla = [0.0; 3];
+    unsafe {
+        XYZToLLHTime(ds50utc, teme_pos, &mut pos_lla);
+    }
+    pos_lla
+}
+
+#[pyfunction(name = "time_teme_to_lla")]
+pub fn py_time_teme_to_lla(ds50utc: f64, teme_pos: [f64; 3]) -> [f64; 3] {
+    time_teme_to_lla(ds50utc, &teme_pos)
+}
+
+pub fn teme_to_topo(
+    theta: f64,
+    lat: f64,
+    sen_pos: &[f64; 3],
+    sat_pos: &[f64; 3],
+    sat_vel: &[f64; 3],
+) -> [f64; XA_TOPO_SIZE] {
+    let mut xa_topo = [0.0; XA_TOPO_SIZE];
+    unsafe {
+        ECIToTopoComps(theta, lat, sen_pos, sat_pos, sat_vel, &mut xa_topo);
+    }
+    xa_topo
+}
+
+#[pyfunction(name = "teme_to_topo")]
+pub fn py_teme_to_topo(
+    theta: f64,
+    lat: f64,
+    sen_pos: [f64; 3],
+    sat_pos: [f64; 3],
+    sat_vel: [f64; 3],
+) -> [f64; XA_TOPO_SIZE] {
+    teme_to_topo(theta, lat, &sen_pos, &sat_pos, &sat_vel)
+}
+
+pub fn register_astro_func_interface(parent_module: &Bound<'_, PyModule>) -> PyResult<()> {
+    let astro_func_interface = PyModule::new(parent_module.py(), "astro_func_interface")?;
+    astro_func_interface.add_function(wrap_pyfunction!(py_teme_to_topo, &astro_func_interface)?)?;
+    astro_func_interface.add_function(wrap_pyfunction!(py_ra_dec_to_az_el_time, &astro_func_interface)?)?;
+    astro_func_interface.add_function(wrap_pyfunction!(py_ra_dec_to_az_el, &astro_func_interface)?)?;
+    astro_func_interface.add_function(wrap_pyfunction!(py_theta_teme_to_lla, &astro_func_interface)?)?;
+    astro_func_interface.add_function(wrap_pyfunction!(py_time_teme_to_lla, &astro_func_interface)?)?;
+    astro_func_interface.add("XA_TOPO_RA", XA_TOPO_RA)?;
+    astro_func_interface.add("XA_TOPO_DEC", XA_TOPO_DEC)?;
+    astro_func_interface.add("XA_TOPO_AZ", XA_TOPO_AZ)?;
+    astro_func_interface.add("XA_TOPO_EL", XA_TOPO_EL)?;
+    astro_func_interface.add("XA_TOPO_RANGE", XA_TOPO_RANGE)?;
+    astro_func_interface.add("XA_TOPO_RADOT", XA_TOPO_RADOT)?;
+    astro_func_interface.add("XA_TOPO_DECDOT", XA_TOPO_DECDOT)?;
+    astro_func_interface.add("XA_TOPO_AZDOT", XA_TOPO_AZDOT)?;
+    astro_func_interface.add("XA_TOPO_ELDOT", XA_TOPO_ELDOT)?;
+    astro_func_interface.add("XA_TOPO_RANGEDOT", XA_TOPO_RANGEDOT)?;
+    astro_func_interface.add("XA_TOPO_SIZE", XA_TOPO_SIZE)?;
+    py_run!(
+        parent_module.py(),
+        astro_func_interface,
+        "import sys; sys.modules['keplemon._keplemon.saal.astro_func_interface'] = astro_func_interface"
+    );
+
+    parent_module.add_submodule(&astro_func_interface)
 }

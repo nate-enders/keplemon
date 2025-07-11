@@ -2,8 +2,64 @@
 from __future__ import annotations
 from keplemon.time import Epoch
 from keplemon.enums import Classification, KeplerianType, ReferenceFrame
-from keplemon.propagation import ForceProperties
 from keplemon.events import CloseApproach
+
+class HorizonElements:
+    """
+    Args:
+        range: Range in **_kilometers_**
+        az: Azimuth in **_degrees_**
+        el: Elevation in **_degrees_**
+        range_rate: Range rate in **_kilometers per second_**
+        az_rate: Azimuth rate in **_degrees per second_**
+        el_rate: Elevation rate in **_degrees per second_**
+    """
+
+    range: float | None
+    azimuth: float
+    elevation: float
+    range_rate: float | None
+    azimuth_rate: float | None
+    elevation_rate: float | None
+
+    def __init__(
+        self,
+        azimuth: float,
+        elevation: float,
+    ) -> None: ...
+
+class HorizonState:
+    """
+    Args:
+        epoch: UTC epoch of the state
+        elements: HorizonElements of the state
+    """
+
+    epoch: Epoch
+    """UTC epoch of the state"""
+
+    elements: HorizonElements
+    """Horizon elements of the state"""
+
+    range: float | None
+    """Range in **_kilometers_**"""
+
+    azimuth: float
+    """Azimuth in **_degrees_**"""
+
+    elevation: float
+    """Elevation in **_degrees_**"""
+
+    range_rate: float | None
+    """Range rate in **_kilometers per second_**"""
+
+    azimuth_rate: float | None
+    """Azimuth rate in **_degrees per second_**"""
+
+    elevation_rate: float | None
+    """Elevation rate in **_degrees per second_**"""
+
+    def __init__(self, epoch: Epoch, elements: HorizonElements) -> None: ...
 
 class KeplerianElements:
     """

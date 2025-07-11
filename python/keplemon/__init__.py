@@ -1,4 +1,4 @@
-from keplemon._keplemon.time import load_time_constants  # type: ignore
+from keplemon._keplemon.saal.time_func_interface import load_time_constants  # type: ignore
 from keplemon._keplemon import (  # type: ignore
     get_thread_count,
     set_thread_count,

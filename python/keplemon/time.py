@@ -1,5 +1,4 @@
 from keplemon._keplemon.time import (  # type: ignore
-    load_time_constants,
     TimeSpan,
     TimeComponents,
     Epoch,
@@ -9,7 +8,6 @@ from datetime import datetime
 from keplemon._keplemon.enums import TimeSystem  # type: ignore
 
 __all__ = [
-    "load_time_constants",
     "TimeSpan",
     "TimeComponents",
     "Epoch",
@@ -18,13 +16,9 @@ __all__ = [
 
 
 def request_time_constants_update(output_path: str) -> None:
-    finals = requests.get(
-        "https://maia.usno.navy.mil/ser7/finals.all"
-    ).text.splitlines()
+    finals = requests.get("https://maia.usno.navy.mil/ser7/finals.all").text.splitlines()
 
-    leap_seconds = requests.get(
-        "https://maia.usno.navy.mil/ser7/tai-utc.dat"
-    ).text.splitlines()
+    leap_seconds = requests.get("https://maia.usno.navy.mil/ser7/tai-utc.dat").text.splitlines()
 
     month_map = {
         "JAN": 1,

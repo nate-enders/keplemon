@@ -1,8 +1,8 @@
 # flake8: noqa
-from keplemon.elements import TLE, CartesianState, Ephemeris
+from keplemon.elements import TLE, CartesianState, Ephemeris, KeplerianState
 from keplemon.catalogs import TLECatalog
 from keplemon.time import Epoch, TimeSpan
-from keplemon.events import CloseApproach, CloseApproachReport
+from keplemon.events import CloseApproach, CloseApproachReport, HorizonAccessReport
 
 class Earth:
     @staticmethod
@@ -26,6 +26,9 @@ class Satellite:
     """
     name: str | None
     """Human-readable name of the satellite"""
+
+    keplerian_state: KeplerianState | None
+    """Keplerian state of the satellite at the epoch of the TLE, if available"""
 
     @classmethod
     def from_tle(cls, tle: TLE) -> Satellite:
@@ -153,6 +156,28 @@ class Constellation:
         ...
 
     def __getitem__(self, satellite_id: int) -> Satellite: ...
+    def get_horizon_access_report(
+        self,
+        site: Observatory,
+        start: Epoch,
+        end: Epoch,
+        min_el: float,
+        min_duration: TimeSpan,
+    ) -> HorizonAccessReport:
+        """
+        Calculate horizon access to a given observatory.
+
+        Args:
+            site: Observatory to check for horizon access
+            start: UTC epoch of the start of the report
+            end: UTC epoch of the end of the report
+            min_el: Minimum elevation angle in **_degrees_**
+            min_duration: Minimum duration of access
+
+        Returns:
+            Horizon access report for the constellation from the observatory
+        """
+        ...
 
 class Sensor:
     """
@@ -202,5 +227,28 @@ class Observatory:
 
         Returns:
             TEME Cartesian state of the observatory in **_kilometers_** and **_kilometers per second_**
+        """
+        ...
+
+    def get_horizon_access_report(
+        self,
+        satellite: Satellite,
+        start: Epoch,
+        end: Epoch,
+        min_el: float,
+        min_duration: TimeSpan,
+    ) -> HorizonAccessReport:
+        """
+        Calculate horizon access for a satellite from the observatory.
+
+        Args:
+            satellite: Satellite to check for horizon access
+            start: UTC epoch of the start of the report
+            end: UTC epoch of the end of the report
+            min_el: Minimum elevation angle in **_degrees_**
+            min_duration: Minimum duration of access in **_seconds_**
+
+        Returns:
+            Horizon access report for the satellite from the observatory
         """
         ...

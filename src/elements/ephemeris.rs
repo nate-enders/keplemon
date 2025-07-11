@@ -1,8 +1,8 @@
 use crate::bodies::Earth;
 use crate::configs::{CONJUNCTION_STEP_MINUTES, MAX_NEWTON_ITERATIONS, NEWTON_TOLERANCE};
-use crate::elements::{CartesianState, CartesianVector};
+use crate::elements::{CartesianState, CartesianVector, HorizonState};
 use crate::enums::{ReferenceFrame, TimeSystem};
-use crate::events::CloseApproach;
+use crate::events::{CloseApproach, HorizonAccess};
 use crate::saal::ext_ephem_interface;
 use crate::time::{Epoch, TimeSpan};
 use pyo3::prelude::*;
@@ -75,6 +75,75 @@ impl Ephemeris {
             }
             Err(_) => None,
         }
+    }
+
+    pub fn get_horizon_accesses(
+        &self,
+        sensor: &Ephemeris,
+        min_el: f64,
+        min_duration: TimeSpan,
+    ) -> Option<Vec<HorizonAccess>> {
+        let (ds50_start, ds50_end) = ext_ephem_interface::get_ds50_utc_range(self.key).unwrap();
+        let start_epoch = Epoch::from_days_since_1950(ds50_start, TimeSystem::UTC);
+        let end_epoch = Epoch::from_days_since_1950(ds50_end, TimeSystem::UTC);
+        let dt = min_duration * 0.5;
+
+        let mut accesses = Vec::new();
+        let mut next_epoch = start_epoch;
+        let mut current_horizon = HorizonState::from_teme_states(
+            sensor.get_state_at_epoch(next_epoch)?,
+            self.get_state_at_epoch(next_epoch)?,
+        );
+
+        let visible_at_start = current_horizon.get_elevation() >= min_el;
+        let mut last_entry = current_horizon;
+        next_epoch += dt;
+
+        while next_epoch <= end_epoch
+            && sensor.get_state_at_epoch(next_epoch).is_some()
+            && self.get_state_at_epoch(next_epoch).is_some()
+        {
+            let old_horizon = current_horizon;
+            let old_el_sign = (old_horizon.get_elevation() - min_el).signum();
+
+            current_horizon = HorizonState::from_teme_states(
+                sensor.get_state_at_epoch(next_epoch).unwrap(),
+                self.get_state_at_epoch(next_epoch).unwrap(),
+            );
+
+            let new_el_sign = (current_horizon.get_elevation() - min_el).signum();
+            if old_el_sign != new_el_sign {
+                let t_guess = estimate_horizon_crossing_epoch(&old_horizon, min_el);
+
+                if let Some(crossing) = refine_horizon_crossing(sensor, self, t_guess, min_el) {
+                    if crossing.get_elevation_rate().unwrap() > 0.0 {
+                        last_entry = crossing;
+                    } else if crossing.epoch - last_entry.epoch >= min_duration {
+                        accesses.push(HorizonAccess::new(self.satellite_id, &last_entry, &crossing));
+                    }
+                    if crossing.epoch > next_epoch {
+                        next_epoch = crossing.epoch;
+                    }
+                }
+            }
+
+            next_epoch += dt;
+        }
+
+        if accesses.is_empty() && visible_at_start {
+            accesses.push(HorizonAccess::new(
+                self.satellite_id,
+                &HorizonState::from_teme_states(
+                    sensor.get_state_at_epoch(start_epoch).unwrap(),
+                    self.get_state_at_epoch(start_epoch).unwrap(),
+                ),
+                &HorizonState::from_teme_states(
+                    sensor.get_state_at_epoch(end_epoch).unwrap(),
+                    self.get_state_at_epoch(end_epoch).unwrap(),
+                ),
+            ));
+        }
+        Some(accesses)
     }
 
     pub fn get_close_approach(&self, other: &Ephemeris, distance_threshold: f64) -> Option<CloseApproach> {
@@ -160,6 +229,45 @@ fn estimate_close_approach_epoch(state_1: &CartesianState, state_2: &CartesianSt
             Some(t0 - TimeSpan::from_seconds(numerator / denominator))
         }
     }
+}
+
+fn estimate_horizon_crossing_epoch(state_1: &HorizonState, min_elevation: f64) -> Epoch {
+    let t0 = state_1.epoch;
+
+    // Linear interpolation to find the time when the elevation crosses the minimum
+    let delta_t = (min_elevation - state_1.get_elevation()) / state_1.get_elevation_rate().unwrap();
+    t0 + TimeSpan::from_seconds(delta_t)
+}
+
+fn refine_horizon_crossing(
+    ephem_1: &Ephemeris,
+    ephem_2: &Ephemeris,
+    t_guess: Epoch,
+    min_el: f64,
+) -> Option<HorizonState> {
+    // Use Newton's method to refine the time of horizon crossing
+    let mut t = t_guess;
+
+    for _ in 0..MAX_NEWTON_ITERATIONS {
+        // Propagate both satellites to time t and get their horizon states
+        let sensor_teme = ephem_1.get_state_at_epoch(t)?;
+        let target_teme = ephem_2.get_state_at_epoch(t)?;
+
+        let horizon = HorizonState::from_teme_states(sensor_teme, target_teme);
+
+        let elevation = horizon.get_elevation();
+        let elevation_rate = horizon.get_elevation_rate().unwrap();
+        let dt = (min_el - elevation) / elevation_rate;
+        t += TimeSpan::from_seconds(dt);
+        if dt.abs() < NEWTON_TOLERANCE {
+            break;
+        }
+    }
+
+    Some(HorizonState::from_teme_states(
+        ephem_1.get_state_at_epoch(t).unwrap(),
+        ephem_2.get_state_at_epoch(t).unwrap(),
+    ))
 }
 
 fn refine_close_approach(ephem_1: &Ephemeris, ephem_2: &Ephemeris, t_guess: Epoch) -> Option<CloseApproach> {

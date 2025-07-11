@@ -1,8 +1,9 @@
 use super::Satellite;
+use crate::bodies::Observatory;
 use crate::catalogs::TLECatalog;
 use crate::configs;
 use crate::elements::{CartesianState, Ephemeris};
-use crate::events::CloseApproachReport;
+use crate::events::{CloseApproachReport, HorizonAccessReport};
 use crate::time::{Epoch, TimeSpan};
 use pyo3::prelude::*;
 use rayon::prelude::*;
@@ -46,6 +47,41 @@ impl Constellation {
                 (*satellite_id, state)
             })
             .collect()
+    }
+
+    pub fn get_horizon_access_report(
+        &self,
+        site: &Observatory,
+        start: Epoch,
+        end: Epoch,
+        min_el: f64,
+        min_duration: TimeSpan,
+    ) -> HorizonAccessReport {
+        // get TEME states for site
+        let site_ephem = site.get_ephemeris(start, end, min_duration);
+
+        // get TEME states for all satellites
+        let sat_ephem_list: Vec<Ephemeris> = self
+            .satellites
+            .par_iter()
+            .filter_map(|(_, sat)| sat.get_ephemeris(start, end, min_duration))
+            .collect();
+
+        // create empty report
+        let mut report = HorizonAccessReport::new(start, end, min_el, min_duration);
+
+        // parallelize the access report generation
+        let num = sat_ephem_list.len();
+        let accesses = (0..num)
+            .into_par_iter()
+            .filter_map(|i| {
+                let sat_ephem = &sat_ephem_list[i];
+                sat_ephem.get_horizon_accesses(&site_ephem, min_el, min_duration)
+            })
+            .collect::<Vec<_>>();
+
+        report.set_accesses(accesses.into_iter().flatten().collect());
+        report
     }
 
     pub fn get_ca_report_vs_one(

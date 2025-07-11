@@ -1,8 +1,8 @@
 use super::Sensor;
-use crate::elements::{CartesianState, CartesianVector};
+use crate::elements::{CartesianState, CartesianVector, Ephemeris};
 use crate::enums::ReferenceFrame;
 use crate::saal::astro_func_interface;
-use crate::time::Epoch;
+use crate::time::{Epoch, TimeSpan};
 use pyo3::prelude::*;
 
 #[pyclass]
@@ -14,6 +14,18 @@ pub struct Observatory {
     longitude: f64,
     altitude: f64,
     sensors: Vec<Sensor>,
+}
+
+impl Observatory {
+    pub fn get_ephemeris(&self, start_epoch: Epoch, end_epoch: Epoch, step: TimeSpan) -> Ephemeris {
+        let ephemeris = Ephemeris::new(1, self.get_state_at_epoch(start_epoch));
+        let mut next_epoch: Epoch = start_epoch + step;
+        while next_epoch <= end_epoch {
+            ephemeris.add_state(self.get_state_at_epoch(next_epoch));
+            next_epoch += step;
+        }
+        ephemeris
+    }
 }
 
 #[pymethods]

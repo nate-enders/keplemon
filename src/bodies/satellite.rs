@@ -90,17 +90,6 @@ impl Satellite {
             },
             None => Ok(None),
         }
-
-        // self.keplerian_state.as_ref().map(|state| {
-        //     TLE::new(
-        //         self.satellite_id,
-        //         self.name.clone(),
-        //         Classification::Unclassified,
-        //         "".to_string(),
-        //         *state,
-        //         self.force_properties,
-        //     )
-        // })
     }
 
     #[staticmethod]

@@ -1,4 +1,3 @@
-use crate::saal::time_func_interface;
 mod epoch;
 mod time_components;
 mod time_span;
@@ -19,8 +18,6 @@ pub const HOURS_TO_DAYS: f64 = 1.0 / DAYS_TO_HOURS;
 
 pub fn register_time(parent_module: &Bound<'_, PyModule>) -> PyResult<()> {
     let time = PyModule::new(parent_module.py(), "time")?;
-    time.add_function(wrap_pyfunction!(time_func_interface::load_time_constants, &time)?)?;
-    time.add_function(wrap_pyfunction!(time_func_interface::time_constants_loaded, &time)?)?;
     time.add_class::<TimeSpan>()?;
     time.add_class::<Epoch>()?;
     time.add_class::<TimeComponents>()?;

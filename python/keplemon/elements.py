@@ -7,6 +7,8 @@ from keplemon._keplemon.elements import (  # type: ignore
     Ephemeris,
     SphericalVector,
     TopocentricElements,
+    HorizonState,
+    HorizonElements,
 )
 
 __all__ = [
@@ -18,4 +20,6 @@ __all__ = [
     "Ephemeris",
     "SphericalVector",
     "TopocentricElements",
+    "HorizonState",
+    "HorizonElements",
 ]

@@ -1,3 +1,5 @@
+use std::ops::{Div, Mul};
+
 use super::{DAYS_TO_HOURS, DAYS_TO_MINUTES, DAYS_TO_SECONDS, HOURS_TO_DAYS, MINUTES_TO_DAYS, SECONDS_TO_DAYS};
 use pyo3::prelude::*;
 
@@ -7,7 +9,33 @@ pub struct TimeSpan {
     days: f64,
 }
 
-impl TimeSpan {}
+impl PartialOrd for TimeSpan {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        self.days.partial_cmp(&other.days)
+    }
+}
+
+impl TimeSpan {
+    pub fn new(days: f64) -> Self {
+        Self { days }
+    }
+}
+
+impl Div<f64> for TimeSpan {
+    type Output = f64;
+
+    fn div(self, rhs: f64) -> Self::Output {
+        self.days / rhs
+    }
+}
+
+impl Mul<f64> for TimeSpan {
+    type Output = Self;
+
+    fn mul(self, rhs: f64) -> Self::Output {
+        Self { days: self.days * rhs }
+    }
+}
 
 #[pymethods]
 impl TimeSpan {

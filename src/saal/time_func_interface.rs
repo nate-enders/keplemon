@@ -2,7 +2,9 @@
 #![allow(non_snake_case)]
 #![allow(dead_code)]
 use super::{main_interface, GetSetString};
+use crate::exceptions::SAALError;
 use pyo3::prelude::*;
+use pyo3::py_run;
 use std::os::raw::c_char;
 
 extern "C" {
@@ -182,6 +184,11 @@ pub fn ymd_components_to_ds50(year: i32, month: i32, day: i32, hour: i32, minute
     unsafe { TimeComps2ToUTC(year, month, day, hour, minute, second) }
 }
 
+#[pyfunction(name = "ymd_components_to_ds50")]
+pub fn py_ymd_components_to_ds50(year: i32, month: i32, day: i32, hour: i32, minute: i32, second: f64) -> f64 {
+    ymd_components_to_ds50(year, month, day, hour, minute, second)
+}
+
 #[inline]
 pub fn ds50_to_ymd_components(ds50: f64) -> (i32, i32, i32, i32, i32, f64) {
     let mut year = 0;
@@ -266,6 +273,11 @@ pub fn ds50_utc_to_ut1(ds50_utc: f64) -> f64 {
     unsafe { UTCToUT1(ds50_utc) }
 }
 
+#[pyfunction(name = "ds50_utc_to_ut1")]
+pub fn py_ds50_utc_to_ut1(ds50_utc: f64) -> f64 {
+    ds50_utc_to_ut1(ds50_utc)
+}
+
 #[inline]
 pub fn ds50_utc_to_tt(ds50_utc: f64) -> f64 {
     unsafe { UTCToET(ds50_utc) }
@@ -276,16 +288,21 @@ pub fn ds50_tai_to_ut1(ds50_tai: f64) -> f64 {
     unsafe { TAIToUT1(ds50_tai) }
 }
 
-#[pyfunction]
-pub fn load_time_constants(path: &str) -> PyResult<()> {
+pub fn load_time_constants(path: &str) -> Result<(), String> {
     let path = std::ffi::CString::new(path).unwrap();
     let err_code = unsafe { TConLoadFile(path.as_ptr()) };
     if err_code == 0 {
         Ok(())
     } else {
-        Err(PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(
-            main_interface::get_last_error_message(),
-        ))
+        Err(main_interface::get_last_error_message())
+    }
+}
+
+#[pyfunction(name = "load_time_constants")]
+pub fn py_load_time_constants(path: String) -> PyResult<()> {
+    match load_time_constants(&path) {
+        Ok(_) => Ok(()),
+        Err(e) => Err(PyErr::new::<SAALError, _>(e)),
     }
 }
 
@@ -294,12 +311,43 @@ pub fn get_fk4_greenwich_angle(ds50_ut1: f64) -> f64 {
     unsafe { ThetaGrnwchFK4(ds50_ut1) }
 }
 
+#[pyfunction(name = "get_fk4_greenwich_angle")]
+pub fn py_get_fk4_greenwich_angle(ds50_ut1: f64) -> f64 {
+    get_fk4_greenwich_angle(ds50_ut1)
+}
+
 #[inline]
 pub fn get_fk5_greenwich_angle(ds50_ut1: f64) -> f64 {
     unsafe { ThetaGrnwchFK5(ds50_ut1) }
 }
 
-#[pyfunction]
+#[pyfunction(name = "get_fk5_greenwich_angle")]
+pub fn py_get_fk5_greenwich_angle(ds50_ut1: f64) -> f64 {
+    get_fk5_greenwich_angle(ds50_ut1)
+}
+
 pub fn time_constants_loaded() -> bool {
     unsafe { IsTConFileLoaded() != 0 }
+}
+
+#[pyfunction(name = "time_constants_loaded")]
+pub fn py_time_constants_loaded() -> bool {
+    time_constants_loaded()
+}
+
+pub fn register_time_func_interface(parent_module: &Bound<'_, PyModule>) -> PyResult<()> {
+    let time_func_interface = PyModule::new(parent_module.py(), "time_func_interface")?;
+    time_func_interface.add_function(wrap_pyfunction!(py_time_constants_loaded, &time_func_interface)?)?;
+    time_func_interface.add_function(wrap_pyfunction!(py_load_time_constants, &time_func_interface)?)?;
+    time_func_interface.add_function(wrap_pyfunction!(py_ds50_utc_to_ut1, &time_func_interface)?)?;
+    time_func_interface.add_function(wrap_pyfunction!(py_get_fk4_greenwich_angle, &time_func_interface)?)?;
+    time_func_interface.add_function(wrap_pyfunction!(py_get_fk5_greenwich_angle, &time_func_interface)?)?;
+    time_func_interface.add_function(wrap_pyfunction!(py_ymd_components_to_ds50, &time_func_interface)?)?;
+    py_run!(
+        parent_module.py(),
+        time_func_interface,
+        "import sys; sys.modules['keplemon._keplemon.saal.time_func_interface'] = time_func_interface"
+    );
+
+    parent_module.add_submodule(&time_func_interface)
 }
