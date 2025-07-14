@@ -95,7 +95,7 @@ impl Ephemeris {
             self.get_state_at_epoch(next_epoch)?,
         );
 
-        let visible_at_start = current_horizon.get_elevation() >= min_el;
+        let mut always_visible = current_horizon.get_elevation() >= min_el;
         let mut last_entry = current_horizon;
         next_epoch += dt;
 
@@ -113,6 +113,7 @@ impl Ephemeris {
 
             let new_el_sign = (current_horizon.get_elevation() - min_el).signum();
             if old_el_sign != new_el_sign {
+                always_visible = false;
                 let t_guess = estimate_horizon_crossing_epoch(&old_horizon, min_el);
 
                 if let Some(crossing) = refine_horizon_crossing(sensor, self, t_guess, min_el) {
@@ -130,7 +131,7 @@ impl Ephemeris {
             next_epoch += dt;
         }
 
-        if accesses.is_empty() && visible_at_start {
+        if accesses.is_empty() && always_visible && self.get_state_at_epoch(end_epoch).is_some() {
             accesses.push(HorizonAccess::new(
                 self.satellite_id,
                 &HorizonState::from_teme_states(
@@ -240,8 +241,8 @@ fn estimate_horizon_crossing_epoch(state_1: &HorizonState, min_elevation: f64) -
 }
 
 fn refine_horizon_crossing(
-    ephem_1: &Ephemeris,
-    ephem_2: &Ephemeris,
+    sensor_ephem: &Ephemeris,
+    sat_ephem: &Ephemeris,
     t_guess: Epoch,
     min_el: f64,
 ) -> Option<HorizonState> {
@@ -250,8 +251,8 @@ fn refine_horizon_crossing(
 
     for _ in 0..MAX_NEWTON_ITERATIONS {
         // Propagate both satellites to time t and get their horizon states
-        let sensor_teme = ephem_1.get_state_at_epoch(t)?;
-        let target_teme = ephem_2.get_state_at_epoch(t)?;
+        let sensor_teme = sensor_ephem.get_state_at_epoch(t)?;
+        let target_teme = sat_ephem.get_state_at_epoch(t)?;
 
         let horizon = HorizonState::from_teme_states(sensor_teme, target_teme);
 
@@ -265,8 +266,8 @@ fn refine_horizon_crossing(
     }
 
     Some(HorizonState::from_teme_states(
-        ephem_1.get_state_at_epoch(t).unwrap(),
-        ephem_2.get_state_at_epoch(t).unwrap(),
+        sensor_ephem.get_state_at_epoch(t).unwrap(),
+        sat_ephem.get_state_at_epoch(t).unwrap(),
     ))
 }
 

@@ -1,4 +1,5 @@
 use super::{TimeComponents, TimeSpan};
+use crate::configs::ZERO_TOLERANCE;
 use crate::enums::TimeSystem;
 use crate::saal::time_func_interface;
 use pyo3::prelude::*;
@@ -64,7 +65,7 @@ impl PartialOrd for Epoch {
 
 impl Ord for Epoch {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        if self.days_since_1950 == other.days_since_1950 {
+        if (self.days_since_1950 - other.days_since_1950).abs() < ZERO_TOLERANCE {
             std::cmp::Ordering::Equal
         } else if self.days_since_1950 < other.days_since_1950 {
             std::cmp::Ordering::Less
